@@ -1,0 +1,331 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/ROB5201314/ROB_Script/refs/heads/main/windty.ui"))()
+local Window = WindUI:CreateWindow({
+    Title = "ROBScript",
+    Icon = "dick",
+    Author = "定制(建造一个环形农场)",
+    Folder = "CloudHub",
+    Size = UDim2.fromOffset(500, 400),
+    Transparent = true,
+    Theme = "Dark",
+    User = {
+        Enabled = true,
+        Callback = function() end,
+        Anonymous = false
+    },
+    SideBarWidth = 200,
+    ScrollBarEnabled = true
+})
+
+task.wait(0.2)
+local bg = Window.UIElements.Main.Background
+bg.ImageTransparency = 0.15
+bg.ImageColor3 = Color3.fromRGB(80, 180, 120)
+
+local corner = Instance.new("UICorner")
+corner.Parent = Window.UIElements.Main
+corner.CornerRadius = UDim.new(0, 12)
+
+local TitleFrame = Window.UIElements.Main.Main
+local titleCorner = Instance.new("UICorner")
+titleCorner.Parent = TitleFrame
+titleCorner.CornerRadius = UDim.new(0, 8)
+
+local MyImage = Instance.new("ImageLabel")
+MyImage.Parent = TitleFrame
+MyImage.BackgroundTransparency = 1
+MyImage.Size = UDim2.new(0, 45, 0, 45)
+MyImage.Position = UDim2.new(0, 10, 0, 5)
+MyImage.Image = "https://assetdelivery.roblox.com/v1/asset/?id=120304335380449"
+
+local TimeTag = Window:Tag({
+    Title = "--:--",
+    Radius = 999,
+    Color = Color3.fromRGB(220, 220, 220),
+})
+
+task.spawn(function()
+    while true do
+        local now = os.date("*t")
+        local hours = string.format("%02d", now.hour)
+        local minutes = string.format("%02d", now.min)
+        TimeTag:SetTitle(hours .. ":" .. minutes)
+        task.wait(0.06)
+    end
+end)
+
+local function showFloatingMessage(msg)
+    local gui = Instance.new("ScreenGui")
+    gui.Parent = game.CoreGui
+    gui.ResetOnSpawn = false
+    local label = Instance.new("TextLabel")
+    label.Parent = gui
+    label.Text = msg
+    label.TextSize = 20
+    label.Font = Enum.Font.GothamBold
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.BackgroundTransparency = 0.2
+    label.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    label.BorderSizePixel = 0
+    label.Size = UDim2.new(0, 300, 0, 40)
+    label.Position = UDim2.new(0.5, -150, 1, -50)
+    label.AnchorPoint = Vector2.new(0.5, 1)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = label
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = 1.5
+    stroke.Color = Color3.fromRGB(100, 200, 255)
+    stroke.Parent = label
+    local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local tween = game:GetService("TweenService"):Create(label, tweenInfo, {Position = UDim2.new(0.5, -150, 0.85, 0)})
+    tween:Play()
+    tween.Completed:Connect(function()
+        task.wait(1.5)
+        local fadeOut = game:GetService("TweenService"):Create(label, TweenInfo.new(0.8, Enum.EasingStyle.Linear), {TextTransparency = 1, BackgroundTransparency = 1})
+        fadeOut:Play()
+        fadeOut.Completed:Connect(function()
+            gui:Destroy()
+        end)
+    end)
+end
+
+task.wait(0.5)
+showFloatingMessage("欢迎老板使用定制Script")
+
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local clickEffectGui = Instance.new("ScreenGui")
+clickEffectGui.Parent = game.CoreGui
+clickEffectGui.ResetOnSpawn = false
+clickEffectGui.Name = "ClickEffectGui"
+clickEffectGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        local pos = input.Position
+        local image = Instance.new("ImageLabel")
+        image.Parent = clickEffectGui
+        image.BackgroundTransparency = 1
+        image.Size = UDim2.new(0, 30, 0, 30)
+        image.AnchorPoint = Vector2.new(0.5, 0.5)
+        image.Position = UDim2.new(0, pos.X, 0, pos.Y)
+        image.Image = "https://assetdelivery.roblox.com/v1/asset/?id=103766254978089"
+        image.ZIndex = 999
+        
+        TweenService:Create(image, TweenInfo.new(0.6, Enum.EasingStyle.Linear), {Rotation = 360}):Play()
+        TweenService:Create(image, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Size = UDim2.new(0, 45, 0, 45)}):Play()
+        TweenService:Create(image, TweenInfo.new(1, Enum.EasingStyle.Linear), {ImageTransparency = 1}):Play()
+        
+        task.delay(1.2, function()
+            if image then image:Destroy() end
+        end)
+    end
+end)
+
+local MainTab = Window:Tab({
+    Title = "功能",
+    Icon = "rbxassetid://103766254978089",
+    Locked = false,
+})
+
+local seedRunning = false
+local seedRefreshThread = nil
+local seedBuyThread = nil
+local seedDiscardThread = nil
+
+local function stopSeed()
+    seedRunning = false
+    if seedRefreshThread then task.cancel(seedRefreshThread) seedRefreshThread = nil end
+    if seedBuyThread then task.cancel(seedBuyThread) seedBuyThread = nil end
+    if seedDiscardThread then task.cancel(seedDiscardThread) seedDiscardThread = nil end
+end
+
+local function startSeed()
+    if seedRunning then return end
+    seedRunning = true
+    
+    local RS = game:GetService("ReplicatedStorage")
+    local RollSeeds = RS.Remotes.RollSeeds
+    local BuySeed = RS.Remotes.BuySeed
+    local EquipTool = RS.Remotes.EquipTool
+    local DiscardSeed = RS.Remotes.DiscardSeed
+    local Players = game:GetService("Players")
+    local LocalPlayer = Players.LocalPlayer
+    local whitelist = {"Golden Quillflower","Papaya","Ghost Pepper","Ember Fruit","Muck Monarch","Aurora Lotus","Garden Devourer","Durian"}
+    local function normalize(str) return str:gsub("%s+",""):lower() end
+    local keepSet = {}
+    for _, name in ipairs(whitelist) do keepSet[normalize(name)] = true end
+    
+    seedRefreshThread = task.spawn(function()
+        while seedRunning do
+            RollSeeds:FireServer()
+            task.wait(0.5)
+        end
+    end)
+    
+    seedBuyThread = task.spawn(function()
+        while seedRunning do
+            for slot = 1, 6 do
+                pcall(BuySeed.FireServer, BuySeed, slot)
+                task.wait(0.1)
+            end
+        end
+    end)
+    
+    seedDiscardThread = task.spawn(function()
+        while seedRunning do
+            for _, item in ipairs(LocalPlayer.Backpack:GetChildren()) do
+                if not keepSet[normalize(item.Name)] then
+                    EquipTool:FireServer(item)
+                    DiscardSeed:FireServer()
+                end
+                task.wait(0)
+            end
+            task.wait(0.05)
+        end
+    end)
+end
+
+MainTab:Toggle({
+    Title = "自动刷种子买种子",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        if state then
+            startSeed()
+        else
+            stopSeed()
+        end
+    end
+})
+
+local honeyRunning = false
+local honeyThread = nil
+
+local function stopHoney()
+    honeyRunning = false
+    if honeyThread then task.cancel(honeyThread) honeyThread = nil end
+end
+
+local function startHoney()
+    if honeyRunning then return end
+    honeyRunning = true
+    
+    honeyThread = task.spawn(function()
+        while honeyRunning do
+            local Players = game:GetService("Players")
+            local LocalPlayer = Players.LocalPlayer
+            local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+            local HumanoidRootPart = Character and Character:FindFirstChild("HumanoidRootPart")
+            if not HumanoidRootPart then
+                task.wait(1)
+                continue
+            end
+            
+            local startCFrame = HumanoidRootPart.CFrame
+            
+            local targets = {}
+            for _, obj in ipairs(workspace:GetDescendants()) do
+                if obj.Name == "BoundingBox" and obj:IsA("BasePart") then
+                    local prompt = obj:FindFirstChildWhichIsA("ProximityPrompt") or obj:FindFirstChildOfClass("ProximityPrompt")
+                    if prompt then
+                        table.insert(targets, { part = obj, prompt = prompt })
+                    end
+                end
+            end
+            
+            for _, target in ipairs(targets) do
+                if not honeyRunning then break end
+                local targetPos = target.part.Position + Vector3.new(0, 3, 0)
+                HumanoidRootPart.CFrame = CFrame.new(targetPos)
+                task.wait(0)
+                for i = 1, 15 do
+                    if not honeyRunning then break end
+                    pcall(function()
+                        fireproximityprompt(target.prompt)
+                    end)
+                    task.wait(0)
+                end
+            end
+            
+            HumanoidRootPart.CFrame = startCFrame
+            task.wait(2)
+        end
+    end)
+end
+
+MainTab:Toggle({
+    Title = "自动捡蜂蜜",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        if state then
+            startHoney()
+        else
+            stopHoney()
+        end
+    end
+})
+
+local antiAfkStarted = false
+
+MainTab:Button({
+    Title = "防踢出",
+    Desc = "",
+    Callback = function()
+        if antiAfkStarted then
+            showFloatingMessage("防踢出已在运行")
+            return
+        end
+        antiAfkStarted = true
+        
+        local ba = Instance.new("ScreenGui")
+        local ca = Instance.new("TextLabel")
+        local da = Instance.new("Frame")
+        local _b = Instance.new("TextLabel")
+        local ab = Instance.new("TextLabel")
+        ba.Parent = game.CoreGui
+        ba.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+        ca.Parent = ba
+        ca.Active = true
+        ca.BackgroundColor3 = Color3.new(0.176471,0.176471,0.176471)
+        ca.Draggable = true
+        ca.Position = UDim2.new(0.698610067,0,0.098096624,0)
+        ca.Size = UDim2.new(0,370,0,52)
+        ca.Font = Enum.Font.SourceSansSemibold
+        ca.Text = "Anti Afk"
+        ca.TextColor3 = Color3.new(0,1,1)
+        ca.TextSize = 22
+        da.Parent = ca
+        da.BackgroundColor3 = Color3.new(0.196078,0.196078,0.196078)
+        da.Position = UDim2.new(0,0,1.0192306,0)
+        da.Size = UDim2.new(0,370,0,107)
+        _b.Parent = da
+        _b.BackgroundColor3 = Color3.new(0.176471,0.176471,0.176471)
+        _b.Position = UDim2.new(0,0,0.800455689,0)
+        _b.Size = UDim2.new(0,370,0,21)
+        _b.Font = Enum.Font.Arial
+        _b.Text = ""
+        _b.TextColor3 = Color3.new(0,1,1)
+        _b.TextSize = 20
+        ab.Parent = da
+        ab.BackgroundColor3 = Color3.new(0.176471,0.176471,0.176471)
+        ab.Position = UDim2.new(0,0,0.158377,0)
+        ab.Size = UDim2.new(0,370,0,44)
+        ab.Font = Enum.Font.ArialBold
+        ab.Text = "Status: Active"
+        ab.TextColor3 = Color3.new(0,1,1)
+        ab.TextSize = 20
+        
+        local bb = game:service'VirtualUser'
+        game:service'Players'.LocalPlayer.Idled:connect(function()
+            bb:CaptureController()
+            bb:ClickButton2(Vector2.new())
+            ab.Text = "Roblox kicked you but we didnt let them!"
+            task.wait(2)
+            ab.Text = "Status : Active"
+        end)
+        
+        showFloatingMessage("已启动防踢出")
+    end
+})
