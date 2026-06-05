@@ -267,23 +267,17 @@ local function startHoney()
                 end
             end
             
-            if #targets == 0 then
-                task.wait(3)
-                continue
-            end
-            
             for _, target in ipairs(targets) do
                 if not honeyRunning then break end
-                local targetPos = target.part.Position + Vector3.new(0, 2.5, 0)
+                local targetPos = target.part.Position + Vector3.new(0, 3, 0)
                 HumanoidRootPart.CFrame = CFrame.new(targetPos)
-                task.wait(0.15)
-                
-                for i = 1, 5 do
+                task.wait(0)
+                for i = 1, 15 do
                     if not honeyRunning then break end
                     pcall(function()
-                        target.prompt:InputHoldBegin()
+                        fireproximityprompt(target.prompt)
                     end)
-                    task.wait(0.1)
+                    task.wait(0)
                 end
             end
             
@@ -302,6 +296,59 @@ MainTab:Toggle({
             startHoney()
         else
             stopHoney()
+        end
+    end
+})
+
+local upgradeRunning = false
+local upgradeThread = nil
+
+local function stopUpgrade()
+    upgradeRunning = false
+    if upgradeThread then task.cancel(upgradeThread) upgradeThread = nil end
+end
+
+local function startUpgrade()
+    if upgradeRunning then return end
+    upgradeRunning = true
+    local Event = game:GetService("ReplicatedStorage").Remotes.UpgradePlant
+    
+    upgradeThread = task.spawn(function()
+        while upgradeRunning do
+            local dirtList = {}
+            pcall(function()
+                for _, area in ipairs(workspace.Map.Plots:GetChildren()) do
+                    local farmPlot = area:FindFirstChild("FarmPlot")
+                    if farmPlot then
+                        for _, plot in ipairs(farmPlot:GetChildren()) do
+                            local dirt = plot:FindFirstChild("Dirt")
+                            if dirt then
+                                table.insert(dirtList, dirt)
+                            end
+                        end
+                    end
+                end
+            end)
+            
+            for _, dirt in ipairs(dirtList) do
+                if not upgradeRunning then break end
+                pcall(Event.InvokeServer, Event, dirt)
+            end
+            
+            task.wait(0.1)
+        end
+    end)
+end
+
+MainTab:Toggle({
+    Title = "自动升级地块",
+    Desc = "",
+    Value = false,
+    Callback = function(state)
+        if state then
+            startUpgrade()
+        else
+            stopUpgrade()
         end
     end
 })
