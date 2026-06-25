@@ -1,0 +1,122 @@
+task.wait(1)
+
+local player = game:GetService("Players").LocalPlayer
+local vim = game:GetService("VirtualInputManager")
+local runService = game:GetService("RunService")
+
+local function mouse1press(x, y)
+    vim:SendMouseButtonEvent(x, y, 0, true, game, 1)
+end
+
+local function mouse1release(x, y)
+    vim:SendMouseButtonEvent(x, y, 0, false, game, 1)
+end
+
+local function getTargetPosition()
+    local targetPart = workspace.Battles:GetChildren()[53]
+    if targetPart and targetPart:IsA("BasePart") then
+        return targetPart.Position
+    end
+end
+
+local function teleportToTarget()
+    local targetPart = workspace.Battles:GetChildren()[53]
+    if not targetPart or not targetPart:IsA("BasePart") then return end
+    local pos = targetPart.Position
+    local char = player.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    local root = char.HumanoidRootPart
+
+    local backOffset = -targetPart.CFrame.LookVector * 5
+    root.CFrame = CFrame.new(pos + backOffset)
+    task.wait(0.1)
+    root.CFrame = CFrame.new(pos)
+end
+
+task.spawn(function()
+    while true do
+        local char = player.Character
+        local backpack = player:FindFirstChild("Backpack")
+        if char and backpack then
+            for _, tool in ipairs(backpack:GetChildren()) do
+                if tool:IsA("Tool") and not char:FindFirstChild(tool.Name) then
+                    tool.Parent = char
+                end
+            end
+        end
+        task.wait(0.3)
+    end
+end)
+
+teleportToTarget()
+
+task.spawn(function()
+    while true do
+        task.wait(20)
+        teleportToTarget()
+    end
+end)
+
+local function getNearestHead()
+    local char = player.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return nil end
+    local rootPos = char.HumanoidRootPart.Position
+    local nearest = nil
+    local minDist = 1000
+    for _, obj in ipairs(workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and obj.Name == "Head" then
+            local dist = (obj.Position - rootPos).Magnitude
+            if dist < minDist then
+                minDist = dist
+                nearest = obj
+            end
+        end
+    end
+    return nearest
+end
+
+local currentTarget = nil
+local lastTargetCheck = 0
+runService.RenderStepped:Connect(function()
+    local char = player.Character
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    local humanoid = char:FindFirstChild("Humanoid")
+    if humanoid then
+        humanoid.AutoRotate = false
+    end
+    local now = tick()
+    if now - lastTargetCheck > 0.5 then
+        currentTarget = getNearestHead()
+        lastTargetCheck = now
+    end
+    if currentTarget and currentTarget.Parent then
+        local rootPart = char.HumanoidRootPart
+        local lookPos = currentTarget.Position
+        local dir = (lookPos - rootPart.Position).Unit
+        dir = Vector3.new(dir.X, 0, dir.Z).Unit
+        if dir.Magnitude > 0 then
+            rootPart.CFrame = CFrame.new(rootPart.Position, rootPart.Position + dir)
+        end
+    end
+end)
+
+task.spawn(function()
+    while true do
+        local args = {
+            [1] = game:GetService("Lighting").Weapons.Stick
+        }
+        game:GetService("Lighting").UseWeapon:FireServer(unpack(args))
+        task.wait(0.5)
+    end
+end)
+
+local baseX, baseY = 345, 169
+local offsetX, offsetY = 20, 140
+local x, y = baseX + offsetX, baseY + offsetY
+
+while true do
+    mouse1press(x, y)
+    task.wait(0.05)
+    mouse1release(x, y)
+    task.wait(1)
+end
