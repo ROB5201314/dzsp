@@ -1,0 +1,978 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/ROB5201314/ROB_Script/refs/heads/main/windty.ui"))()
+local Window = WindUI:CreateWindow({
+    Title = "ROBScript",
+    Icon = "dick",
+    Author = "定制",
+    Folder = "CloudHub",
+    Size = UDim2.fromOffset(500, 400),
+    Transparent = true,
+    Theme = "Dark",
+    User = {
+        Enabled = true,
+        Callback = function() end,
+        Anonymous = false
+    },
+    SideBarWidth = 200,
+    ScrollBarEnabled = true
+})
+
+task.wait(0.2)
+local bg = Window.UIElements.Main.Background
+bg.ImageTransparency = 0.15
+bg.ImageColor3 = Color3.fromRGB(80, 180, 120)
+local corner = Instance.new("UICorner")
+corner.Parent = Window.UIElements.Main
+corner.CornerRadius = UDim.new(0, 12)
+local TitleFrame = Window.UIElements.Main.Main
+local titleCorner = Instance.new("UICorner")
+titleCorner.Parent = TitleFrame
+titleCorner.CornerRadius = UDim.new(0, 8)
+local MyImage = Instance.new("ImageLabel")
+MyImage.Parent = TitleFrame
+MyImage.BackgroundTransparency = 1
+MyImage.Size = UDim2.new(0, 45, 0, 45)
+MyImage.Position = UDim2.new(0, 10, 0, 5)
+MyImage.Image = "https://assetdelivery.roblox.com/v1/asset/?id=120304335380449"
+local TimeTag = Window:Tag({
+    Title = "--:--",
+    Radius = 999,
+    Color = Color3.fromRGB(220, 220, 220),
+})
+task.spawn(function()
+    while true do
+        local now = os.date("*t")
+        local hours = string.format("%02d", now.hour)
+        local minutes = string.format("%02d", now.min)
+        TimeTag:SetTitle(hours .. ":" .. minutes)
+        task.wait(0.06)
+    end
+end)
+
+local function showFloatingMessage(msg)
+    local gui = Instance.new("ScreenGui")
+    gui.Parent = game.CoreGui
+    gui.ResetOnSpawn = false
+    local label = Instance.new("TextLabel")
+    label.Parent = gui
+    label.Text = msg
+    label.TextSize = 20
+    label.Font = Enum.Font.GothamBold
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.BackgroundTransparency = 0.2
+    label.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    label.BorderSizePixel = 0
+    label.Size = UDim2.new(0, 300, 0, 40)
+    label.Position = UDim2.new(0.5, -150, 1, -50)
+    label.AnchorPoint = Vector2.new(0.5, 1)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = label
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = 1.5
+    stroke.Color = Color3.fromRGB(100, 200, 255)
+    stroke.Parent = label
+    local tweenInfo = TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local tween = game:GetService("TweenService"):Create(label, tweenInfo, {Position = UDim2.new(0.5, -150, 0.85, 0)})
+    tween:Play()
+    tween.Completed:Connect(function()
+        task.wait(1.5)
+        local fadeOut = game:GetService("TweenService"):Create(label, TweenInfo.new(0.8, Enum.EasingStyle.Linear), {TextTransparency = 1, BackgroundTransparency = 1})
+        fadeOut:Play()
+        fadeOut.Completed:Connect(function()
+            gui:Destroy()
+        end)
+    end)
+end
+
+task.wait(0.5)
+showFloatingMessage("欢迎老板使用定制Script")
+
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local clickEffectGui = Instance.new("ScreenGui")
+clickEffectGui.Parent = game.CoreGui
+clickEffectGui.ResetOnSpawn = false
+clickEffectGui.Name = "ClickEffectGui"
+clickEffectGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        local pos = input.Position
+        local image = Instance.new("ImageLabel")
+        image.Parent = clickEffectGui
+        image.BackgroundTransparency = 1
+        image.Size = UDim2.new(0, 30, 0, 30)
+        image.AnchorPoint = Vector2.new(0.5, 0.5)
+        image.Position = UDim2.new(0, pos.X, 0, pos.Y)
+        image.Image = "https://assetdelivery.roblox.com/v1/asset/?id=103766254978089"
+        image.ZIndex = 999
+        TweenService:Create(image, TweenInfo.new(0.6, Enum.EasingStyle.Linear), {Rotation = 360}):Play()
+        TweenService:Create(image, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Size = UDim2.new(0, 45, 0, 45)}):Play()
+        TweenService:Create(image, TweenInfo.new(1, Enum.EasingStyle.Linear), {ImageTransparency = 1}):Play()
+        task.delay(1.2, function()
+            if image then image:Destroy() end
+        end)
+    end
+end)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = workspace
+local ReplicatedStorage = game:GetService("ReplicatedStorage")
+local CollectionService = game:GetService("CollectionService")
+local TeleportService = game:GetService("TeleportService")
+local HttpService = game:GetService("HttpService")
+local Lighting = game:GetService("Lighting")
+local LP = Players.LocalPlayer
+local genv = getgenv() or _G
+
+local Net, PSC
+pcall(function() Net = require(ReplicatedStorage.SharedModules.Networking) end)
+pcall(function() PSC = require(ReplicatedStorage.ClientModules.PlayerStateClient) end)
+if not Net then return end
+
+local SeedData = {}
+pcall(function() SeedData = require(ReplicatedStorage.SharedModules.SeedData) end)
+local FCalc
+pcall(function() FCalc = require(ReplicatedStorage.SharedModules.FruitValueCalc) end)
+local PetData = {}
+pcall(function() PetData = require(ReplicatedStorage.SharedData.PetData) end)
+
+local function getReplica() return PSC and PSC:GetLocalReplica() end
+local function getData() local r = getReplica() return r and r.Data end
+local function getShk() local d = getData() return d and d.Sheckles or 0 end
+local function myPlot()
+    local g = Workspace:FindFirstChild("Gardens")
+    if g then for _, p in ipairs(g:GetChildren()) do if p:GetAttribute("OwnerUserId") == LP.UserId then return p end end end
+    return nil
+end
+local function isNight() return ReplicatedStorage:FindFirstChild("Night") and ReplicatedStorage.Night.Value == true end
+local function chr() return LP.Character end
+local function hrp() local c = chr() return c and c:FindFirstChild("HumanoidRootPart") end
+local function hmd() local c = chr() return c and c:FindFirstChildOfClass("Humanoid") end
+
+local function fire(pkt, ...) local a = {...} return pcall(function() pkt:Fire(table.unpack(a)) end) end
+
+local S = {
+    abSeed = false, bSeeds = {},
+    aPlant = false, pSeeds = {}, pRes = 0, mxCyc = 40, pDly = 0.14, pLoop = 1.2, smtRp = false, aExp = false,
+    pPat = "填充", pSrc = "我的种子", aBld = false, rmCrops = {},
+    aColl = false, hCrops = {}, hMuts = false, fDly = 0.05, hLoop = 1,
+    aSell = false, sInt = 20, sFull = false,
+    aSteal = false, sRet = true, sMul = 1,
+    pHarv = false, retl = false,
+    aGrab = false, gRare = true, pRet = true, nRare = true,
+    abGear = false, bGears = {}, abCrate = false,
+    aEgg = false, aCrate = false, aPack = false,
+    aTame = false, tAnim = {}, aEquip = false, ePets = {},
+    wSpd = 16, jPow = 50, iJump = false, nclip = false, fly = false, fSpd = 60,
+    aAfk = true, opt = false, aProg = false,
+    hlRdy = false, hlRare = false, rNtfy = false,
+    aHop = false,
+}
+
+local function fVal(m)
+    local base = 0
+    local seed = m:GetAttribute("CorePartName") or m:GetAttribute("SeedName")
+    if seed and FCalc then pcall(function() base = FCalc(seed, 1, nil, LP, nil) end) end
+    local mul = m:GetAttribute("SizeMulti") or m:GetAttribute("SizeMultiplier") or 1
+    local bonus = m:GetAttribute("Mutation") and 2.35 or 1
+    return base * (tonumber(mul)^2.65) * bonus
+end
+local function ripe(m)
+    local age, mx = tonumber(m:GetAttribute("Age")), tonumber(m:GetAttribute("MaxAge"))
+    if age and mx then return age >= mx - 0.001 end
+    for _, d in ipairs(m:GetDescendants()) do if d:IsA("ProximityPrompt") and CollectionService:HasTag(d, "HarvestPrompt") then return true end end
+    return false
+end
+
+local function ownTargets(filt)
+    local useCrop = filt and next(S.hCrops) ~= nil
+    local out = {}
+    local plot = myPlot(); if not plot then return out end
+    local plants = plot:FindFirstChild("Plants"); if not plants then return out end
+    local function consider(m)
+        if not m:GetAttribute("PlantId") then return end
+        local crop = m:GetAttribute("CorePartName") or m:GetAttribute("SeedName")
+        local mutOk = (not filt) or (not S.hMuts) or (m:GetAttribute("Mutation") ~= nil)
+        if ((not useCrop) or (crop and S.hCrops[crop] == true)) and mutOk then out[#out + 1] = m end
+    end
+    for _, plant in ipairs(plants:GetChildren()) do
+        local fr = plant:FindFirstChild("Fruits")
+        local fruits = fr and fr:GetChildren() or {}
+        if #fruits > 0 then for _, m in ipairs(fruits) do if ripe(m) then consider(m) end end
+        elseif ripe(plant) then consider(plant) end
+    end
+    return out
+end
+
+local function stealTgts()
+    local out = {}
+    for _, p in ipairs(CollectionService:GetTagged("StealPrompt")) do
+        local m = p.Parent and p.Parent:FindFirstAncestorWhichIsA("Model")
+        if m then
+            local uid = tonumber(m:GetAttribute("UserId"))
+            if uid and uid ~= LP.UserId and m:GetAttribute("PlantId") then out[#out + 1] = { m = m, v = fVal(m) } end
+        end
+    end
+    table.sort(out, function(a, b) return a.v > b.v end)
+    return out
+end
+
+local function harvestAll(filt)
+    local plot = myPlot(); local ref = plot and plot:FindFirstChild("PlotSizeReference"); local r = hrp()
+    if ref and r and (Vector3.new(r.Position.X, 0, r.Position.Z) - Vector3.new(ref.Position.X, 0, ref.Position.Z)).Magnitude > 16 then
+        pcall(function() reach(ref.Position) end); task.wait(0.12)
+    end
+    local t = ownTargets(filt); local n = 0
+    for _, m in ipairs(t) do
+        local pid = m:GetAttribute("PlantId")
+        if pid then fire(Net.Garden.CollectFruit, pid, m:GetAttribute("FruitId") or ""); n = n + 1; task.wait(S.fDly) end
+    end
+    return n
+end
+
+local function stealModel(m, mult, skip)
+    if not m or not m.Parent then return end
+    local uid, pid = tonumber(m:GetAttribute("UserId")), m:GetAttribute("PlantId")
+    if not (uid and pid) then return end
+    if not skip then pcall(function() reach(m:GetPivot().Position) end); task.wait(0.05) end
+    fire(Net.Steal.BeginSteal, uid, pid, m:GetAttribute("FruitId") or "")
+    for _ = 1, math.max(1, mult or 1) do fire(Net.Steal.CompleteSteal) end
+end
+
+local HOP = 70
+local function setColl(on)
+    local c = chr(); if not c then return end
+    for _, p in ipairs(c:GetDescendants()) do if p:IsA("BasePart") then pcall(function() p.CanCollide = on end) end end
+end
+local function reach(pos)
+    local r = hrp(); if not (r and pos) then return end
+    local tgt = pos + Vector3.new(0, 3, 0)
+    setColl(false)
+    for _ = 1, 60 do
+        local cur = r.Position; local dt = tgt - cur
+        if dt.Magnitude <= HOP then r.CFrame = CFrame.new(tgt); break end
+        r.CFrame = CFrame.new(cur + dt.Unit * HOP); RunService.Heartbeat:Wait()
+    end
+    if not S.nclip then setColl(true) end
+end
+
+local function plantAreas(plot)
+    local areas = {}
+    for _, p in ipairs(CollectionService:GetTagged("PlantArea")) do
+        if p:IsA("BasePart") and p:IsDescendantOf(plot) and p.Size.X * p.Size.Z > 400 then areas[#areas + 1] = p end
+    end
+    if #areas == 0 then local ref = plot:FindFirstChild("PlotSizeReference"); if ref then areas = { ref } end end
+    return areas
+end
+local function patKeep(pat, gx, gz)
+    if pat == "棋盘" then return (gx + gz) % 2 == 0
+    elseif pat == "行" then return gz % 2 == 0
+    elseif pat == "列" then return gx % 2 == 0
+    elseif pat == "对角" then return (gx - gz) % 3 == 0
+    elseif pat == "间隔" then return gx % 2 == 0 and gz % 2 == 0 end
+    return true
+end
+local function plantPos(plot)
+    local pat = S.pPat or "填充"; local step = 6; local seen, list = {}, {}
+    for _, area in ipairs(plantAreas(plot)) do
+        local cf, sz = area.CFrame, area.Size; local topY = area.Position.Y + sz.Y / 2 + 0.3
+        local hx, hz = sz.X / 2 - 3, sz.Z / 2 - 3; local nx, nz = math.floor((2 * hx) / step), math.floor((2 * hz) / step)
+        for ix = 0, nx do for iz = 0, nz do
+            local w = (cf * CFrame.new(-hx + ix * step, 0, -hz + iz * step)).Position
+            local gx, gz = math.floor(w.X / step + 0.5), math.floor(w.Z / step + 0.5)
+            if patKeep(pat, gx, gz) then
+                local key = math.floor(w.X / 4 + 0.5) .. "," .. math.floor(w.Z / 4 + 0.5)
+                if not seen[key] then seen[key] = true; list[#list + 1] = Vector3.new(w.X, topY, w.Z) end
+            end
+        end end
+    end
+    return list
+end
+local function freePos(plot)
+    local grid = plantPos(plot); local plants = plot:FindFirstChild("Plants"); local occ = {}
+    if plants then for _, pl in ipairs(plants:GetChildren()) do local ok, pv = pcall(function() return pl:GetPivot().Position end) if ok then occ[#occ + 1] = pv end end end
+    local free = {} for _, pos in ipairs(grid) do local clear = true for _, o in ipairs(occ) do if (Vector3.new(o.X, 0, o.Z) - Vector3.new(pos.X, 0, pos.Z)).Magnitude < 6 then clear = false break end end if clear then free[#free + 1] = pos end end
+    return free
+end
+
+local function stockIt(shop)
+    local sv = ReplicatedStorage:FindFirstChild("StockValues"); sv = sv and sv:FindFirstChild(shop)
+    return sv and sv:FindFirstChild("Items")
+end
+local function seedStock() return stockIt("SeedShop") end
+local function gearStock() return stockIt("GearShop") end
+local function seedOpts()
+    local seen = {}
+    for _, e in ipairs(SeedData) do if e.SeedName then seen[e.SeedName] = tonumber(e.SeedShopDisplayOrder) or 900 end end
+    local it = seedStock(); if it then for _, sv in ipairs(it:GetChildren()) do if seen[sv.Name] == nil then seen[sv.Name] = 899 end end end
+    local l = {} for name, ord in pairs(seen) do l[#l + 1] = { name, ord } end
+    table.sort(l, function(a, b) if a[2] == b[2] then return a[1] < b[1] end return a[2] < b[2] end)
+    local names = {} for _, x in ipairs(l) do names[#names + 1] = x[1] end
+    return names
+end
+local function ownedSeedOpts()
+    local order = {}
+    for _, e in ipairs(SeedData) do if e.SeedName then order[e.SeedName] = tonumber(e.SeedShopDisplayOrder) or 900 end end
+    local l, d = {}, getData()
+    if d and d.Inventory and d.Inventory.Seeds then for n, c in pairs(d.Inventory.Seeds) do if (c or 0) > 0 then l[#l + 1] = n end end end
+    table.sort(l, function(a, b) local oa, ob = order[a] or 900, order[b] or 900; if oa == ob then return a < b end; return oa < ob end)
+    return l
+end
+local function gearOpts()
+    local it = gearStock(); local l = {}
+    if it then for _, sv in ipairs(it:GetChildren()) do l[#l + 1] = sv.Name end end
+    table.sort(l); return l
+end
+local function plantedOpts()
+    local plot = myPlot(); local seen = {}
+    if plot then local plants = plot:FindFirstChild("Plants")
+        if plants then for _, pl in ipairs(plants:GetChildren()) do local s = pl:GetAttribute("SeedName") or pl:GetAttribute("CorePartName"); if s then seen[s] = true end end end
+    end
+    local l = {} for k in pairs(seen) do l[#l + 1] = k end table.sort(l); return l
+end
+local function harvestOpts()
+    local seen = {}
+    local plot = myPlot()
+    if plot then local plants = plot:FindFirstChild("Plants") if plants then for _, pl in ipairs(plants:GetChildren()) do local s = pl:GetAttribute("SeedName") or pl:GetAttribute("CorePartName"); if s then seen[s] = true end end end end
+    local d = getData(); if d and d.Inventory and d.Inventory.Seeds then for n in pairs(d.Inventory.Seeds) do seen[n] = true end end
+    local l = {} for k in pairs(seen) do l[#l + 1] = k end table.sort(l); return l
+end
+local function petOpts()
+    local d = getData(); local seen = {}
+    if d and d.Inventory and d.Inventory.Pets then
+        for _, info in pairs(d.Inventory.Pets) do local nm = (type(info) == "table" and (info.PetType or info.Name)) or tostring(info); if nm and nm ~= "" then seen[nm] = true end end
+    end
+    local l = {} for k in pairs(seen) do l[#l + 1] = k end table.sort(l); return l
+end
+local function maxEq() return tonumber(LP:GetAttribute("MaxEquippedPets")) or 3 end
+local function animalOpts()
+    local l = {}
+    for k, v in pairs(PetData) do if type(v) == "table" and type(k) == "string" then l[#l + 1] = k end end
+    table.sort(l); return l
+end
+
+local Pft = { startS = nil, session = 0, perMin = 0, perHr = 0, win = {} }
+local function updateProfit()
+    local s = getShk()
+    if Pft.startS == nil then Pft.startS = s end
+    Pft.session = s - Pft.startS
+    table.insert(Pft.win, { t = os.clock(), s = s })
+    while #Pft.win > 1 and (os.clock() - Pft.win[1].t) > 60 do table.remove(Pft.win, 1) end
+    local f = Pft.win[1]; local dt = os.clock() - f.t
+    if dt > 4 then Pft.perMin = (s - f.s) / dt * 60; Pft.perHr = Pft.perMin * 60 end
+end
+
+local Hub = { on = true, cn = {} }
+local function lp(iv, fn)
+    task.spawn(function()
+        while Hub.on do
+            task.wait(iv)
+            if not Hub.on then break end
+            pcall(fn)
+        end
+    end)
+end
+local function tk(c) table.insert(Hub.cn, c); return c end
+
+local flyBV, flyBG
+local function stopFly()
+    if flyBV then pcall(function() flyBV:Destroy() end) flyBV = nil end
+    if flyBG then pcall(function() flyBG:Destroy() end) flyBG = nil end
+    local h = hmd(); if h then h.PlatformStand = false end
+end
+local function startFly()
+    local r = hrp(); if not r then return end
+    stopFly()
+    flyBV = Instance.new("BodyVelocity"); flyBV.MaxForce = Vector3.new(1, 1, 1) * 9e9; flyBV.Velocity = Vector3.zero; flyBV.Parent = r
+    flyBG = Instance.new("BodyGyro"); flyBG.MaxTorque = Vector3.new(1, 1, 1) * 9e9; flyBG.P = 1e5; flyBG.CFrame = r.CFrame; flyBG.Parent = r
+end
+Hub.stopFly = stopFly
+
+local optCn, optOrig
+local function optInst(o)
+    pcall(function()
+        if o:IsA("BasePart") then o.Material = Enum.Material.SmoothPlastic; o.Reflectance = 0; o.CastShadow = false
+        elseif o:IsA("Decal") or o:IsA("Texture") then o.Transparency = 1
+        elseif o:IsA("ParticleEmitter") or o:IsA("Trail") or o:IsA("Beam") or o:IsA("Smoke") or o:IsA("Fire") or o:IsA("Sparkles") then o.Enabled = false
+        elseif o:IsA("PostEffect") then o.Enabled = false
+        end
+    end)
+end
+local function setOpt(on)
+    if on then
+        optOrig = optOrig or { gs = Lighting.GlobalShadows, fc = Lighting.FogColor, fs = Lighting.FogStart, fe = Lighting.FogEnd, br = Lighting.Brightness, oa = Lighting.OutdoorAmbient, am = Lighting.Ambient }
+        pcall(function()
+            Lighting.GlobalShadows = false
+            Lighting.FogColor = Color3.fromRGB(131, 133, 139); Lighting.FogStart = 220; Lighting.FogEnd = 780
+            Lighting.OutdoorAmbient = Color3.fromRGB(140, 140, 146); Lighting.Ambient = Color3.fromRGB(122, 122, 128)
+        end)
+        for _, e in ipairs(Lighting:GetDescendants()) do if e:IsA("Atmosphere") or e:IsA("Clouds") or e:IsA("PostEffect") then pcall(function() e.Enabled = false end) end if e:IsA("Sky") then pcall(function() e.CelestialBodiesShown = false end) end end
+        pcall(function() Workspace.Terrain.Decoration = false end)
+        pcall(function() settings().Rendering.QualityLevel = Enum.QualityLevel.Level01 end)
+        for _, o in ipairs(Workspace:GetDescendants()) do optInst(o) end
+        if optCn then for _, c in ipairs(optCn) do pcall(function() c:Disconnect() end) end end
+        local function onAdd(o) if S.opt then task.defer(optInst, o) end end
+        optCn = { Workspace.DescendantAdded:Connect(onAdd), Lighting.DescendantAdded:Connect(onAdd) }
+        for _, c in ipairs(optCn) do tk(c) end
+    else
+        if optCn then for _, c in ipairs(optCn) do pcall(function() c:Disconnect() end) end optCn = nil end
+        if optOrig then pcall(function()
+            Lighting.GlobalShadows = optOrig.gs; Lighting.FogColor = optOrig.fc; Lighting.FogStart = optOrig.fs; Lighting.FogEnd = optOrig.fe; Lighting.Brightness = optOrig.br
+            Lighting.OutdoorAmbient = optOrig.oa; Lighting.Ambient = optOrig.am
+        end) end
+        for _, e in ipairs(Lighting:GetDescendants()) do if e:IsA("Atmosphere") or e:IsA("Clouds") or e:IsA("PostEffect") then pcall(function() e.Enabled = true end) end if e:IsA("Sky") then pcall(function() e.CelestialBodiesShown = true end) end end
+        pcall(function() Workspace.Terrain.Decoration = true end)
+        for _, o in ipairs(Workspace:GetDescendants()) do
+            if o:IsA("ParticleEmitter") or o:IsA("Trail") or o:IsA("Beam") or o:IsA("Smoke") or o:IsA("Fire") or o:IsA("Sparkles") then pcall(function() o.Enabled = true end)
+            elseif o:IsA("Decal") or o:IsA("Texture") then pcall(function() o.Transparency = 0 end) end
+        end
+    end
+end
+
+local hlF = Instance.new("Folder"); hlF.Name = "Ccat_HL"; hlF.Parent = Workspace
+local function clearHL() for _, h in ipairs(hlF:GetChildren()) do h:Destroy() end end
+local function addHL(model, col)
+    if not model or not model.Parent then return end
+    local h = Instance.new("Highlight"); h.Adornee = model; h.FillColor = col; h.FillTransparency = 0.55
+    h.OutlineColor = col; h.OutlineTransparency = 0; h.DepthMode = Enum.HighlightDepthMode.AlwaysOnTop; h.Parent = hlF
+end
+
+local function fetchSrv()
+    local ok, res = pcall(function() return HttpService:JSONDecode(game:HttpGet("https://games.roblox.com/v1/games/" .. game.PlaceId .. "/servers/Public?sortOrder=Asc&limit=100")) end)
+    return (ok and res and res.data) or {}
+end
+local function serverHop(lowPop)
+    local servers = fetchSrv(); local pick
+    for _, s in ipairs(servers) do
+        if s.id ~= game.JobId and s.playing and s.maxPlayers and s.playing < s.maxPlayers then
+            if lowPop then if not pick or s.playing < pick.playing then pick = s end
+            else pick = s; break end
+        end
+    end
+    if pick then pcall(function() TeleportService:TeleportToPlaceInstance(game.PlaceId, pick.id, LP) end) end
+end
+local function rareInStock()
+    local it = seedStock(); if not it then return false end
+    for _, sv in ipairs(it:GetChildren()) do if sv:IsA("ValueBase") and sv.Value > 0 and ((SeedData[sv.Name] and SeedData[sv.Name].PurchasePrice) or 0) >= 5000 then return true, sv.Name end end
+    return false
+end
+
+local function pkKind(loc)
+    if loc:GetAttribute("GoldSeed") == true then return "金色种子" end
+    if loc:GetAttribute("RainbowSeed") == true then return "彩虹种子" end
+    if loc:GetAttribute("SeedPack") ~= nil then return tostring(loc:GetAttribute("SeedPack")) end
+end
+local function isRare(loc)
+    if loc:GetAttribute("GoldSeed") == true or loc:GetAttribute("RainbowSeed") == true then return true end
+    local sp = loc:GetAttribute("SeedPack")
+    return type(sp) == "string" and (sp:lower():find("gold") or sp:lower():find("rainbow"))
+end
+local function firePrompt(d)
+    pcall(function()
+        local hold = tonumber(d.HoldDuration) or 0
+        if fireproximityprompt then
+            if hold > 0 then fireproximityprompt(d, hold) else fireproximityprompt(d) end
+        else
+            d:InputHoldBegin(); task.wait(hold + 0.1); d:InputHoldEnd()
+        end
+    end)
+end
+local function packLocs() local map = Workspace:FindFirstChild("Map"); local f = map and map:FindFirstChild("SeedPackSpawnServerLocations") return f and f:GetChildren() or {} end
+local function locPart(loc) return loc:IsA("BasePart") and loc or loc:FindFirstChildWhichIsA("BasePart", true) end
+local function locPos(loc)
+    if loc:IsA("BasePart") then return loc.Position end
+    local ok, cf = pcall(function() return loc:GetPivot() end); if ok then return cf.Position end
+    local bp = locPart(loc); return bp and bp.Position or nil
+end
+local function grabPack(loc)
+    for _ = 1, 90 do
+        if not (loc and loc.Parent) then break end
+        local pos = locPos(loc); if not pos then break end
+        local r = hrp()
+        if (r.Position - pos).Magnitude > 6 then reach(pos) end
+        for _, d in ipairs(loc:GetDescendants()) do if d:IsA("ProximityPrompt") then firePrompt(d) end end
+        local part = locPart(loc)
+        if firetouchinterest and part and hrp() then pcall(function() firetouchinterest(hrp(), part, 0); firetouchinterest(hrp(), part, 1) end) end
+        task.wait(0.12)
+    end
+end
+
+lp(2, function()
+    if not S.abSeed then return end
+    local it = seedStock(); if not it then return end
+    local anySel = next(S.bSeeds) ~= nil
+    for _, sv in ipairs(it:GetChildren()) do
+        if sv:IsA("ValueBase") and sv.Value > 0 and ((not anySel) or S.bSeeds[sv.Name] == true) then
+            if getShk() >= (SeedData[sv.Name] and SeedData[sv.Name].PurchasePrice or 0) then fire(Net.SeedShop.PurchaseSeed, sv.Name); task.wait(0.08) end
+        end
+    end
+end)
+
+lp(0.6, function()
+    if not S.aPlant then return end
+    task.wait(math.max(0, S.pLoop - 0.6))
+    if not S.aPlant then return end
+    local plot = myPlot(); if not plot then return end
+    local d = getData(); local seeds = d and d.Inventory and d.Inventory.Seeds; if not seeds then return end
+    local useF = next(S.pSeeds) ~= nil
+    local tp = {}
+    if S.smtRp then
+        local best, bv
+        for n, c in pairs(seeds) do if (c or 0) > 0 and ((not useF) or S.pSeeds[n]) then local v = 0 if FCalc then pcall(function() v = FCalc(n, 1, nil, LP, nil) end) end if not bv or v > bv then best, bv = n, v end end end
+        if best then local keep = S.pRes; local cnt = seeds[best] or 0; for _ = 1, math.min(math.max(0, cnt - keep), 80) do tp[#tp + 1] = best end end
+    else
+        for name, count in pairs(seeds) do if (not useF) or S.pSeeds[name] then local keep = S.pRes; for _ = 1, math.min(math.max(0, count - keep), 40) do tp[#tp + 1] = name end end end
+    end
+    if #tp == 0 then return end
+    local free = freePos(plot); if #free == 0 then return end
+    local cap = math.min(#free, #tp, S.mxCyc)
+    for i = 1, cap do fire(Net.Plant.PlantSeed, free[i], tp[i], plot); task.wait(S.pDly) end
+end)
+
+lp(6, function()
+    if not S.aExp then return end
+    local plot = myPlot(); if not plot then return end
+    fire(Net.Actions.ExpandGarden); task.wait(1)
+end)
+
+lp(0.4, function()
+    if not S.aColl then return end
+    task.wait(math.max(0, S.hLoop - 0.4))
+    if not S.aColl then return end
+    local n = harvestAll(true)
+end)
+
+lp(1, function()
+    if S.sFull then
+        local fc = LP:GetAttribute("FruitCount") or 0; local mx = LP:GetAttribute("MaxFruitCapacity") or 100
+        if fc >= mx - 1 then fire(Net.NPCS.SellAll) end
+    end
+end)
+local sellTimer = 0
+lp(1, function() sellTimer = sellTimer + 1 if S.aSell and sellTimer >= S.sInt then sellTimer = 0 fire(Net.NPCS.SellAll) end end)
+
+lp(0.8, function()
+    if not S.aSteal then return end
+    if not isNight() then return end
+    local home = hrp() and hrp().Position
+    local t = stealTgts(); local n = 0
+    for _, e in ipairs(t) do
+        if not S.aSteal or not isNight() then break end
+        local m = e.m; local pos = (m and m.Parent) and m:GetPivot().Position or nil
+        stealModel(m, S.sMul, false); n = n + 1; task.wait(0.03)
+    end
+    if S.sRet and home then reach(home - Vector3.new(0, 3, 0)) end
+end)
+
+local grabbing = {}
+lp(0.6, function()
+    if not S.aGrab then return end
+    for _, loc in ipairs(packLocs()) do
+        if loc.Parent and not grabbing[loc] then
+            local rare = isRare(loc)
+            if (not S.gRare) or rare then
+                grabbing[loc] = true
+                task.spawn(function() grabPack(loc); grabbing[loc] = nil end)
+            end
+        end
+    end
+end)
+
+lp(0.5, function()
+    local n = isNight()
+    if S.pHarv and n then harvestAll(false) end
+end)
+
+lp(0.6, function()
+    if not S.retl then return end
+    local plot = myPlot(); local ref = plot and plot:FindFirstChild("PlotSizeReference"); if not ref then return end
+    local center, size = ref.Position, ref.Size
+    for _, pl in ipairs(Players:GetPlayers()) do
+        if pl ~= LP and pl.Character then
+            local r = pl.Character:FindFirstChild("HumanoidRootPart")
+            if r and math.abs(r.Position.X - center.X) < size.X / 2 + 4 and math.abs(r.Position.Z - center.Z) < size.Z / 2 + 4 then fire(Net.Shovel.HitPlayer, pl.UserId) end
+        end
+    end
+end)
+
+lp(3, function()
+    if not S.abCrate then return end
+    local it = stockIt("CrateShop"); if not it then return end
+    for _, sv in ipairs(it:GetChildren()) do if sv:IsA("ValueBase") and sv.Value > 0 then fire(Net.CrateShop.PurchaseCrate, sv.Name); task.wait(0.1) end end
+end)
+
+lp(3, function()
+    if not S.abGear then return end
+    local it = gearStock(); if not it then return end
+    local anySel = next(S.bGears) ~= nil
+    for _, sv in ipairs(it:GetChildren()) do if sv:IsA("ValueBase") and sv.Value > 0 and ((not anySel) or S.bGears[sv.Name] == true) then fire(Net.GearShop.PurchaseGear, sv.Name); task.wait(0.1) end end
+end)
+
+local function openAll(invKey, pkt, flag)
+    lp(2.5, function()
+        if not S[flag] then return end
+        local d = getData(); local bag = d and d.Inventory and d.Inventory[invKey]; if not bag then return end
+        for name, count in pairs(bag) do local n = (type(count) == "number") and count or 1 for _ = 1, n do task.spawn(function() fire(pkt, name) end) task.wait(0.15) end end
+    end)
+end
+openAll("Eggs", Net.Egg.OpenEgg, "aEgg")
+openAll("Crates", Net.Crate.OpenCrate, "aCrate")
+openAll("SeedPacks", Net.SeedPack.OpenSeedPack, "aPack")
+
+lp(1.2, function()
+    if not S.aTame then return end
+    local map = Workspace:FindFirstChild("Map"); local refs = map and map:FindFirstChild("WildPetRef"); if not refs then return end
+    local anySel = next(S.tAnim) ~= nil
+    for _, pet in ipairs(refs:GetChildren()) do
+        if not S.aTame then break end
+        local owner = tonumber(pet:GetAttribute("OwnerUserId")) or 0; local species = pet:GetAttribute("PetName")
+        if ((not anySel) or (species and S.tAnim[species] == true)) and (owner == 0 or owner == LP.UserId) and pet:IsA("BasePart") then
+            reach(pet.Position)
+            for _ = 1, 6 do if not S.aTame then break end pcall(function() Net.Pets.WildPetTame:Fire(pet) end) task.wait(0.08) end
+        end
+    end
+end)
+
+lp(5, function()
+    if not S.aEquip then return end
+    local n, mx = 0, maxEq()
+    for name in pairs(S.ePets) do if n >= mx then break end fire(Net.Pets.RequestEquipByName, tostring(name)); n = n + 1; task.wait(0.15) end
+end)
+
+lp(4, function()
+    if not S.aProg then return end
+    local h = harvestAll(false)
+    if (LP:GetAttribute("FruitCount") or 0) > 0 then fire(Net.NPCS.SellAll); task.wait(0.2) end
+    local it = seedStock(); if it then
+        local funds = getShk(); local best, bv
+        for _, sv in ipairs(it:GetChildren()) do
+            if sv:IsA("ValueBase") and sv.Value > 0 then
+                local price = SeedData[sv.Name] and SeedData[sv.Name].PurchasePrice or math.huge
+                local val = 0 if FCalc then pcall(function() val = FCalc(sv.Name, 1, nil, LP, nil) end) end
+                if price <= funds * 0.5 and (not bv or val > bv) then best, bv = sv.Name, val end
+            end
+        end
+        if best then for _ = 1, 6 do if getShk() < (SeedData[best] and SeedData[best].PurchasePrice or 0) then break end fire(Net.SeedShop.PurchaseSeed, best); task.wait(0.1) end end
+    end
+    local plot = myPlot(); if plot then
+        local d = getData(); local seeds = d and d.Inventory and d.Inventory.Seeds; if seeds then
+            local tp = {}
+            for name, count in pairs(seeds) do for _ = 1, math.min(count or 0, 30) do tp[#tp + 1] = name end end
+            local free = freePos(plot); local cap = math.min(#free, #tp); local n = 0
+            for i = 1, cap do fire(Net.Plant.PlantSeed, free[i], tp[i], plot); n = n + 1; task.wait(0.08) end
+        end
+    end
+end)
+
+lp(1.5, function()
+    if not S.aProg then return end
+    local map = Workspace:FindFirstChild("Map"); local refs = map and map:FindFirstChild("WildPetRef"); if not refs then return end
+    for _, pet in ipairs(refs:GetChildren()) do
+        if not S.aProg then break end
+        local species = pet:GetAttribute("PetName"); local owner = tonumber(pet:GetAttribute("OwnerUserId")) or 0
+        local goodPets = { Raccoon = true, Dragonfly = true, ["Dragon Fly"] = true, Dragonling = true, Mimic = true, ["Disco Bee"] = true, ["Queen Bee"] = true, Kitsune = true, ["Red Fox"] = true, Fox = true, Owl = true, ["Night Owl"] = true, Bear = true, ["Polar Bear"] = true, Butterfly = true, ["Golden Lab"] = true, Cat = true, ["Red Giant Ant"] = true, Snail = true }
+        if species and goodPets[species] and (owner == 0 or owner == LP.UserId) and pet:IsA("BasePart") then
+            reach(pet.Position)
+            for _ = 1, 6 do if not S.aProg then break end pcall(function() Net.Pets.WildPetTame:Fire(pet) end) task.wait(0.08) end
+        end
+    end
+end)
+
+lp(1, function()
+    if not (S.hlRdy or S.hlRare) then if #hlF:GetChildren() > 0 then clearHL() end return end
+    clearHL()
+    if S.hlRdy then for _, m in ipairs(ownTargets()) do addHL(m, Color3.fromRGB(196, 30, 58)) end end
+    if S.hlRare then
+        local root = hrp(); local rp = root and root.Position
+        if rp then
+            for _, p in ipairs(CollectionService:GetTagged("StealPrompt")) do
+                local m = p.Parent and p.Parent:FindFirstAncestorWhichIsA("Model")
+                if m and m:GetAttribute("Mutation") then
+                    local ok, piv = pcall(function() return m:GetPivot().Position end)
+                    if ok and (piv - rp).Magnitude < 220 then addHL(m, Color3.fromRGB(255, 205, 70)) end
+                end
+            end
+        end
+    end
+end)
+
+local prevRare = {}
+lp(3, function()
+    if not S.rNtfy then return end
+    local it = seedStock(); if not it then return end
+    for _, sv in ipairs(it:GetChildren()) do
+        if sv:IsA("ValueBase") then
+            local now = sv.Value > 0
+            if now and not prevRare[sv.Name] and (SeedData[sv.Name] and SeedData[sv.Name].PurchasePrice or 0) >= 5000 then
+                showFloatingMessage("稀有种子上架: " .. sv.Name)
+            end
+            prevRare[sv.Name] = now
+        end
+    end
+end)
+
+lp(20, function()
+    if not S.aHop then return end
+    if not rareInStock() then serverHop(false) end
+end)
+
+lp(0, function()
+    local VU = game:GetService("VirtualUser")
+    tk(LP.Idled:Connect(function() if S.aAfk then pcall(function() VU:CaptureController(); VU:ClickButton2(Vector2.new()) end) end end))
+end)
+
+tk(RunService.Heartbeat:Connect(function()
+    if not Hub.on then return end
+    local h = hmd()
+    if h then
+        if S.wSpd ~= 16 then h.WalkSpeed = S.wSpd end
+        if S.jPow ~= 50 then h.UseJumpPower = true; h.JumpPower = S.jPow end
+    end
+    if S.nclip then local c = chr() if c then for _, p in ipairs(c:GetDescendants()) do if p:IsA("BasePart") and p.CanCollide then p.CanCollide = false end end end end
+    if S.fly then
+        local r = hrp(); local cam = Workspace.CurrentCamera
+        if r and cam then
+            if not flyBV then startFly() end
+            if h then h.PlatformStand = true end
+            local d = Vector3.zero
+            local function k(c) return UserInputService:IsKeyDown(c) end
+            if k(Enum.KeyCode.W) then d = d + cam.CFrame.LookVector end
+            if k(Enum.KeyCode.S) then d = d - cam.CFrame.LookVector end
+            if k(Enum.KeyCode.D) then d = d + cam.CFrame.RightVector end
+            if k(Enum.KeyCode.A) then d = d - cam.CFrame.RightVector end
+            if k(Enum.KeyCode.Space) then d = d + Vector3.new(0, 1, 0) end
+            if k(Enum.KeyCode.LeftControl) then d = d - Vector3.new(0, 1, 0) end
+            if flyBV then flyBV.Velocity = (d.Magnitude > 0 and d.Unit or Vector3.zero) * S.fSpd end
+            if flyBG then flyBG.CFrame = cam.CFrame end
+        end
+    elseif flyBV then stopFly() end
+end))
+tk(UserInputService.JumpRequest:Connect(function() if S.iJump then local h = hmd() if h then h:ChangeState(Enum.HumanoidStateType.Jumping) end end end))
+
+function Hub.unload()
+    if not Hub.on then return end
+    Hub.on = false
+    for _, c in ipairs(Hub.cn) do pcall(function() c:Disconnect() end) end
+    Hub.cn = {}
+    if Hub.stopFly then pcall(Hub.stopFly) end
+    local h = hmd(); if h then h.WalkSpeed = 16; h.UseJumpPower = true; h.JumpPower = 50; h.PlatformStand = false end
+    local c = chr(); if c then for _, p in ipairs(c:GetDescendants()) do if p:IsA("BasePart") then pcall(function() p.CanCollide = true end) end end end
+    for k, v in pairs(S) do if type(v) == "boolean" then S[k] = false end end
+    pcall(function() Lib:Unload() end)
+end
+genv.Ccat_unload = Hub.unload
+
+tk(UserInputService.InputBegan:Connect(function(i, gpe) if not gpe and i.KeyCode == Enum.KeyCode.RightShift then pcall(function() Window:Toggle() end) end end))
+
+local TF = Window:Tab({ Title = "农场", Icon = "rbxassetid://103766254978089" })
+
+local perfEnabled = false
+local perfConns = {}
+local playerChars = {}
+local function refreshPlayerList()
+    table.clear(playerChars)
+    for _, plr in ipairs(Players:GetPlayers()) do
+        if plr.Character then playerChars[plr.Character] = true end
+    end
+end
+local function isPlayerPart(part)
+    for char in pairs(playerChars) do if part:IsDescendantOf(char) then return true end end
+    return false
+end
+local function isGreenOrBrown(part)
+    local color = part.Color
+    local r, g, b = color.R, color.G, color.B
+    if g > 0.35 and g > r * 1.5 and g > b * 1.5 then return true end
+    if r >= 0.3 and r <= 0.8 and g >= 0.15 and g <= 0.5 and b <= 0.3 then
+        if math.abs(r - g) < 0.4 then return true end
+    end
+    return false
+end
+local function processInstance(obj)
+    if obj:IsA("BasePart") then
+        if isPlayerPart(obj) then return end
+        if not isGreenOrBrown(obj) then
+            obj.Transparency = 1
+            obj.CanCollide = false
+        end
+    elseif obj:IsA("Decal") or obj:IsA("Texture") then
+        if not isPlayerPart(obj) then obj:Destroy() end
+    elseif obj:IsA("Light") or obj:IsA("PointLight") or obj:IsA("SpotLight") or obj:IsA("SurfaceLight") then
+        obj.Enabled = false
+    elseif obj:IsA("ParticleEmitter") then obj.Enabled = false
+    elseif obj:IsA("Beam") then obj.Enabled = false
+    elseif obj:IsA("Trail") then obj.Enabled = false
+    elseif obj:IsA("Highlight") then obj.Enabled = false
+    elseif obj:IsA("BloomEffect") or obj:IsA("BlurEffect") or obj:IsA("SunRaysEffect") or obj:IsA("ColorCorrectionEffect") then
+        obj.Enabled = false
+    end
+end
+
+TF:Toggle({
+    Title = "提高性能",
+    Value = false,
+    Callback = function(state)
+        perfEnabled = state
+        if state then
+            refreshPlayerList()
+            for _, obj in ipairs(Workspace:GetDescendants()) do processInstance(obj) end
+            table.insert(perfConns, Workspace.DescendantAdded:Connect(processInstance))
+            table.insert(perfConns, Players.PlayerAdded:Connect(function(plr)
+                plr.CharacterAdded:Connect(function(char) playerChars[char] = true end)
+            end))
+        else
+            for _, c in ipairs(perfConns) do c:Disconnect() end
+            perfConns = {}
+        end
+    end
+})
+
+TF:Button({
+    Title = "召唤点击器",
+    Callback = function()
+        loadstring(game:HttpGet("https://pastefy.app/NQ6a6fVF/raw"))()
+    end
+})
+
+local TSh = Window:Tab({ Title = "商店", Icon = "rbxassetid://103766254978089" })
+local TSt = Window:Tab({ Title = "偷取", Icon = "rbxassetid://103766254978089" })
+local TDf = Window:Tab({ Title = "防御", Icon = "rbxassetid://103766254978089" })
+local TEv = Window:Tab({ Title = "活动", Icon = "rbxassetid://103766254978089" })
+local TTm = Window:Tab({ Title = "计时", Icon = "rbxassetid://103766254978089" })
+local TIt = Window:Tab({ Title = "物品", Icon = "rbxassetid://103766254978089" })
+local TPt = Window:Tab({ Title = "宠物", Icon = "rbxassetid://103766254978089" })
+local TStt = Window:Tab({ Title = "统计", Icon = "rbxassetid://103766254978089" })
+local TTp = Window:Tab({ Title = "传送", Icon = "rbxassetid://103766254978089" })
+local TVi = Window:Tab({ Title = "视觉", Icon = "rbxassetid://103766254978089" })
+local TPl = Window:Tab({ Title = "玩家", Icon = "rbxassetid://103766254978089" })
+local TMi = Window:Tab({ Title = "杂项", Icon = "rbxassetid://103766254978089" })
+local TSr = Window:Tab({ Title = "服务器", Icon = "rbxassetid://103766254978089" })
+
+local function mkMultiDD(tab, title, values, defaultSet)
+    local def = {}
+    for _, v in ipairs(values) do if defaultSet[v] then def[#def + 1] = v end end
+    return tab:Dropdown({
+        Title = title,
+        Values = values,
+        Value = def,
+        Multi = true,
+        Callback = function(selected)
+            for k in pairs(defaultSet) do defaultSet[k] = nil end
+            for _, v in ipairs(selected) do defaultSet[v] = true end
+        end
+    })
+end
+
+TF:Toggle({ Title = "自动种植", Value = S.aPlant, Callback = function(v) S.aPlant = v end })
+mkMultiDD(TF, "种植种子", ownedSeedOpts(), S.pSeeds)
+TF:Dropdown({ Title = "种植图案", Values = {"填充", "棋盘", "行", "列", "对角", "间隔"}, Value = S.pPat, Multi = false, Callback = function(v) S.pPat = v end })
+TF:Toggle({ Title = "智能补种", Value = S.smtRp, Callback = function(v) S.smtRp = v end })
+TF:Slider({ Title = "保留数量", Value = { Min = 0, Max = 25, Default = S.pRes }, Callback = function(v) S.pRes = v end })
+TF:Slider({ Title = "每轮最大种植数", Value = { Min = 1, Max = 80, Default = S.mxCyc }, Callback = function(v) S.mxCyc = v end })
+TF:Slider({ Title = "种植延迟(秒)", Value = { Min = 0.05, Max = 1, Default = S.pDly }, Callback = function(v) S.pDly = v end })
+TF:Slider({ Title = "循环延迟(秒)", Value = { Min = 0.5, Max = 10, Default = S.pLoop }, Callback = function(v) S.pLoop = v end })
+TF:Button({ Title = "立即种植一次", Callback = function()
+    local plot = myPlot(); if not plot then return end
+    local d = getData(); local seeds = d and d.Inventory and d.Inventory.Seeds; if not seeds then return end
+    local useF = next(S.pSeeds) ~= nil; local tp = {}
+    for n, c in pairs(seeds) do if (not useF) or S.pSeeds[n] then for _ = 1, math.min(c or 0, 40) do tp[#tp + 1] = n end end end
+    local free = freePos(plot); local n = 0
+    for i = 1, math.min(#free, #tp) do fire(Net.Plant.PlantSeed, free[i], tp[i], plot); n = n + 1; task.wait(0.1) end
+    showFloatingMessage("已种植 " .. n .. " 个")
+end })
+TF:Toggle({ Title = "自动扩建花园", Value = S.aExp, Callback = function(v) S.aExp = v end })
+TF:Button({ Title = "立即扩建", Callback = function() fire(Net.Actions.ExpandGarden) end })
+TF:Toggle({ Title = "自动收获", Value = S.aColl, Callback = function(v) S.aColl = v end })
+mkMultiDD(TF, "只收获作物", harvestOpts(), S.hCrops)
+TF:Toggle({ Title = "仅收获变异", Value = S.hMuts, Callback = function(v) S.hMuts = v end })
+TF:Slider({ Title = "每果实延迟", Value = { Min = 0.02, Max = 0.5, Default = S.fDly }, Callback = function(v) S.fDly = v end })
+TF:Slider({ Title = "收获循环延迟", Value = { Min = 0.5, Max = 10, Default = S.hLoop }, Callback = function(v) S.hLoop = v end })
+TF:Button({ Title = "立即收获", Callback = function() showFloatingMessage("已收获 " .. harvestAll(false)) end })
+TF:Toggle({ Title = "自动出售(定时)", Value = S.aSell, Callback = function(v) S.aSell = v end })
+TF:Slider({ Title = "出售间隔(秒)", Value = { Min = 5, Max = 120, Default = S.sInt }, Callback = function(v) S.sInt = v end })
+TF:Toggle({ Title = "背包满自动出售", Value = S.sFull, Callback = function(v) S.sFull = v end })
+TF:Button({ Title = "立即全部出售", Callback = function() fire(Net.NPCS.SellAll) end })
+
+TSh:Toggle({ Title = "自动购买种子", Value = S.abSeed, Callback = function(v) S.abSeed = v end })
+mkMultiDD(TSh, "购买种子", seedOpts(), S.bSeeds)
+TSh:Toggle({ Title = "自动购买装备", Value = S.abGear, Callback = function(v) S.abGear = v end })
+mkMultiDD(TSh, "购买装备", gearOpts(), S.bGears)
+TSh:Toggle({ Title = "自动购买箱子", Value = S.abCrate, Callback = function(v) S.abCrate = v end })
+
+TSt:Toggle({ Title = "自动偷取", Value = S.aSteal, Callback = function(v) S.aSteal = v end })
+TSt:Toggle({ Title = "完成后返回家中", Value = S.sRet, Callback = function(v) S.sRet = v end })
+TSt:Slider({ Title = "每次偷取果实数", Value = { Min = 1, Max = 10, Default = S.sMul }, Callback = function(v) S.sMul = v end })
+TSt:Button({ Title = "偷取最高价值", Callback = function()
+    if not isNight() then showFloatingMessage("非夜晚") return end
+    local t = stealTgts(); if t[1] then stealModel(t[1].m, S.sMul) end
+end })
+
+TDf:Toggle({ Title = "夜晚紧急收获", Value = S.pHarv, Callback = function(v) S.pHarv = v end })
+TDf:Toggle({ Title = "反击入侵者", Value = S.retl, Callback = function(v) S.retl = v end })
+
+TEv:Toggle({ Title = "自动抓取种子包", Value = S.aGrab, Callback = function(v) S.aGrab = v end })
+TEv:Toggle({ Title = "仅稀有", Value = S.gRare, Callback = function(v) S.gRare = v end })
+TEv:Toggle({ Title = "活动后返回", Value = S.pRet, Callback = function(v) S.pRet = v end })
+TEv:Toggle({ Title = "稀有刷新通知", Value = S.nRare, Callback = function(v) S.nRare = v end })
+
+local evLbl = TTm:Paragraph({ Title = "活动", Desc = "-" })
+local evTLbl = TTm:Paragraph({ Title = "剩余", Desc = "-" })
+local sLbl = TTm:Paragraph({ Title = "种子商店", Desc = "-" })
+local gLbl = TTm:Paragraph({ Title = "装备商店", Desc = "-" })
+local cLbl = TTm:Paragraph({ Title = "箱子商店", Desc = "-" })
+lp(1, function()
+    local raw, _, endsAt = Workspace:GetAttribute("ActiveWeather"), Workspace:GetAttribute("ActivePhase"), tonumber(Workspace:GetAttribute("PhaseDuration"))
+    evLbl:SetDesc(raw)
+    evTLbl:SetDesc(endsAt and math.max(0, endsAt - os.time()) or "-")
+    local s = restockIn("SeedShop") sLbl:SetDesc(s and math.max(0, s) or "-")
+    local g = restockIn("GearShop") gLbl:SetDesc(g and math.max(0, g) or "-")
+    local c = restockIn("CrateShop") cLbl:SetDesc(c and math.max(0, c) or "-")
+end)
+
+TIt:Toggle({ Title = "自动开蛋", Value = S.aEgg, Callback = function(v) S.aEgg = v end })
+TIt:Toggle({ Title = "自动开箱子", Value = S.aCrate, Callback = function(v) S.aCrate = v end })
+TIt:Toggle({ Title = "自动开种子包", Value = S.aPack, Callback = function(v) S.aPack = v end })
+
+TPt:Toggle({ Title = "自动驯服野生动物", Value = S.aTame, Callback = function(v) S.aTame = v end })
+mkMultiDD(TPt, "驯服动物", animalOpts(), S.tAnim)
+TPt:Toggle({ Title = "自动装备宠物", Value = S.aEquip, Callback = function(v) S.aEquip = v end })
+mkMultiDD(TPt, "装备宠物", petOpts(), S.ePets)
+
+local mLbl = TStt:Paragraph({ Title = "每分钟", Desc = "-" })
+local hLbl = TStt:Paragraph({ Title = "每小时", Desc = "-" })
+local sLbl2 = TStt:Paragraph({ Title = "本次会话", Desc = "-" })
+lp(1, function()
+    updateProfit()
+    mLbl:SetDesc(math.floor(Pft.perMin))
+    hLbl:SetDesc(math.floor(Pft.perHr))
+    sLbl2:SetDesc(math.floor(Pft.session))
+end)
+
+TTp:Button({ Title = "种子商店", Callback = function() local t = Workspace:FindFirstChild("Teleports") if t and t.Seeds then reach(t.Seeds.Position) end end })
+TTp:Button({ Title = "装备商店", Callback = function() local t = Workspace:FindFirstChild("Teleports") if t and t.Gears then reach(t.Gears.Position) end end })
+TTp:Button({ Title = "出售NPC", Callback = function() local t = Workspace:FindFirstChild("Teleports") if t and t.Sell then reach(t.Sell.Position) end end })
+TTp:Button({ Title = "我的花园", Callback = function() local plot = myPlot(); if plot and plot.SpawnPoint then reach(plot.SpawnPoint.Position) end end })
+
+TVi:Toggle({ Title = "高亮成熟作物", Value = S.hlRdy, Callback = function(v) S.hlRdy = v end })
+TVi:Toggle({ Title = "高亮变异果实", Value = S.hlRare, Callback = function(v) S.hlRare = v end })
+TVi:Toggle({ Title = "稀有种子补货提醒", Value = S.rNtfy, Callback = function(v) S.rNtfy = v end })
+
+TPl:Slider({ Title = "移动速度", Value = { Min = 16, Max = 120, Default = S.wSpd }, Callback = function(v) S.wSpd = v end })
+TPl:Slider({ Title = "跳跃力", Value = { Min = 50, Max = 250, Default = S.jPow }, Callback = function(v) S.jPow = v end })
+TPl:Toggle({ Title = "无限跳跃", Value = S.iJump, Callback = function(v) S.iJump = v end })
+TPl:Toggle({ Title = "穿墙", Value = S.nclip, Callback = function(v) S.nclip = v if not v then local c = chr() if c then for _, p in ipairs(c:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide = true end end end end end })
+TPl:Toggle({ Title = "飞行", Value = S.fly, Callback = function(v) S.fly = v if not v and Hub.stopFly then Hub.stopFly() end end })
+TPl:Slider({ Title = "飞行速度", Value = { Min = 20, Max = 150, Default = S.fSpd }, Callback = function(v) S.fSpd = v end })
+
+TMi:Toggle({ Title = "自动进度", Value = S.aProg, Callback = function(v) S.aProg = v end })
+TMi:Toggle({ Title = "性能优化", Value = S.opt, Callback = function(v) S.opt = v setOpt(v) end })
+TMi:Toggle({ Title = "防挂机", Value = S.aAfk, Callback = function(v) S.aAfk = v end })
+TMi:Button({ Title = "重新加入", Callback = function() TeleportService:Teleport(game.PlaceId, LP) end })
+TMi:Button({ Title = "切换服务器", Callback = function() pcall(function() Net.AntiAfk.RequestHop:Fire() end) end })
+TMi:Button({ Title = "卸载Hub", Callback = function() Hub.unload() end })
+if S.opt then task.spawn(function() setOpt(true) end) end
+
+TSr:Button({ Title = "切换服务器", Callback = function() serverHop(false) end })
+TSr:Button({ Title = "低人数服务器", Callback = function() serverHop(true) end })
+TSr:Toggle({ Title = "自动切换直到稀有种子", Value = S.aHop, Callback = function(v) S.aHop = v end })
