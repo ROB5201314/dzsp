@@ -1,0 +1,549 @@
+local WindUI = loadstring(game:HttpGet("https://raw.githubusercontent.com/ROB5201314/ROB_Script/refs/heads/main/windty.ui"))()
+local Window = WindUI:CreateWindow({
+    Title = "ROBScript",
+    Icon = "dick",
+    Author = "定制",
+    Folder = "CloudHub",
+    Size = UDim2.fromOffset(500, 400),
+    Transparent = true,
+    Theme = "Dark",
+    User = { Enabled = true, Callback = function() end, Anonymous = false },
+    SideBarWidth = 200,
+    ScrollBarEnabled = true
+})
+
+task.wait(0.2)
+local bg = Window.UIElements.Main.Background
+bg.ImageTransparency = 0.15
+bg.ImageColor3 = Color3.fromRGB(80, 180, 120)
+local corner = Instance.new("UICorner")
+corner.Parent = Window.UIElements.Main
+corner.CornerRadius = UDim.new(0, 12)
+local TitleFrame = Window.UIElements.Main.Main
+local titleCorner = Instance.new("UICorner")
+titleCorner.Parent = TitleFrame
+titleCorner.CornerRadius = UDim.new(0, 8)
+local MyImage = Instance.new("ImageLabel")
+MyImage.Parent = TitleFrame
+MyImage.BackgroundTransparency = 1
+MyImage.Size = UDim2.new(0, 45, 0, 45)
+MyImage.Position = UDim2.new(0, 10, 0, 5)
+MyImage.Image = "https://assetdelivery.roblox.com/v1/asset/?id=120304335380449"
+local TimeTag = Window:Tag({ Title = "--:--", Radius = 999, Color = Color3.fromRGB(220, 220, 220) })
+task.spawn(function()
+    while true do
+        local now = os.date("*t")
+        local hours = string.format("%02d", now.hour)
+        local minutes = string.format("%02d", now.min)
+        TimeTag:SetTitle(hours .. ":" .. minutes)
+        task.wait(0.06)
+    end
+end)
+
+local function showFloatingMessage(msg)
+    local gui = Instance.new("ScreenGui")
+    gui.Parent = game.CoreGui
+    gui.ResetOnSpawn = false
+    local label = Instance.new("TextLabel")
+    label.Parent = gui
+    label.Text = msg
+    label.TextSize = 20
+    label.Font = Enum.Font.GothamBold
+    label.TextColor3 = Color3.fromRGB(255, 255, 255)
+    label.BackgroundTransparency = 0.2
+    label.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    label.BorderSizePixel = 0
+    label.Size = UDim2.new(0, 300, 0, 40)
+    label.Position = UDim2.new(0.5, -150, 1, -50)
+    label.AnchorPoint = Vector2.new(0.5, 1)
+    local corner = Instance.new("UICorner")
+    corner.CornerRadius = UDim.new(0, 8)
+    corner.Parent = label
+    local stroke = Instance.new("UIStroke")
+    stroke.Thickness = 1.5
+    stroke.Color = Color3.fromRGB(100, 200, 255)
+    stroke.Parent = label
+    local tween = game:GetService("TweenService"):Create(label, TweenInfo.new(1, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Position = UDim2.new(0.5, -150, 0.85, 0)})
+    tween:Play()
+    tween.Completed:Connect(function()
+        task.wait(1.5)
+        local fadeOut = game:GetService("TweenService"):Create(label, TweenInfo.new(0.8, Enum.EasingStyle.Linear), {TextTransparency = 1, BackgroundTransparency = 1})
+        fadeOut:Play()
+        fadeOut.Completed:Connect(function() gui:Destroy() end)
+    end)
+end
+
+task.wait(0.5)
+showFloatingMessage("欢迎老板使用定制Script")
+
+local UserInputService = game:GetService("UserInputService")
+local TweenService = game:GetService("TweenService")
+local clickEffectGui = Instance.new("ScreenGui")
+clickEffectGui.Parent = game.CoreGui
+clickEffectGui.ResetOnSpawn = false
+clickEffectGui.Name = "ClickEffectGui"
+clickEffectGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+UserInputService.InputBegan:Connect(function(input, gameProcessed)
+    if input.UserInputType == Enum.UserInputType.MouseButton1 or input.UserInputType == Enum.UserInputType.Touch then
+        local pos = input.Position
+        local image = Instance.new("ImageLabel")
+        image.Parent = clickEffectGui
+        image.BackgroundTransparency = 1
+        image.Size = UDim2.new(0, 30, 0, 30)
+        image.AnchorPoint = Vector2.new(0.5, 0.5)
+        image.Position = UDim2.new(0, pos.X, 0, pos.Y)
+        image.Image = "https://assetdelivery.roblox.com/v1/asset/?id=103766254978089"
+        image.ZIndex = 999
+        TweenService:Create(image, TweenInfo.new(0.6, Enum.EasingStyle.Linear), {Rotation = 360}):Play()
+        TweenService:Create(image, TweenInfo.new(0.5, Enum.EasingStyle.Back), {Size = UDim2.new(0, 45, 0, 45)}):Play()
+        TweenService:Create(image, TweenInfo.new(1, Enum.EasingStyle.Linear), {ImageTransparency = 1}):Play()
+        task.delay(1.2, function() if image then image:Destroy() end end)
+    end
+end)
+
+local Players = game:GetService("Players")
+local RunService = game:GetService("RunService")
+local Workspace = game:GetService("Workspace")
+local Camera = Workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+local Drawing = Drawing
+
+_G.ESP_Enabled = false
+local espCache = {}
+local espBoxOutlineColor = Color3.new(0,0,0)
+local espBoxColor = Color3.new(1,0,0)
+local espNameEnemyColor = Color3.new(1,0,0)
+local espNameTeamColor = Color3.new(0,1,0)
+local espHealthOutlineColor = Color3.new(0,0,0)
+local espHealthHighColor = Color3.new(0,1,0)
+local espHealthLowColor = Color3.new(1,0,0)
+local CHAR_SIZE = Vector2.new(4,6)
+
+local function floor2(v) return Vector2.new(math.floor(v.X), math.floor(v.Y)) end
+
+local function createEsp(player)
+    if player == LocalPlayer or espCache[player] then return end
+    if espCache[player] then
+        for _, d in pairs(espCache[player]) do d:Remove() end
+        espCache[player] = nil
+    end
+    local esp = {}
+    esp.boxOutline = Drawing.new("Square")
+    esp.boxOutline.Color = espBoxOutlineColor
+    esp.boxOutline.Thickness = 3
+    esp.boxOutline.Filled = false
+    esp.boxOutline.Visible = false
+    esp.box = Drawing.new("Square")
+    esp.box.Color = espBoxColor
+    esp.box.Thickness = 1
+    esp.box.Filled = false
+    esp.box.Visible = false
+    esp.name = Drawing.new("Text")
+    esp.name.Font = (syn and not RectDynamic) and 2 or 1
+    esp.name.Outline = true
+    esp.name.Center = true
+    esp.name.Size = 13
+    esp.name.Visible = false
+    esp.healthOutline = Drawing.new("Line")
+    esp.healthOutline.Thickness = 3
+    esp.healthOutline.Color = espHealthOutlineColor
+    esp.healthOutline.Visible = false
+    esp.health = Drawing.new("Line")
+    esp.health.Thickness = 1
+    esp.health.Visible = false
+    espCache[player] = esp
+end
+
+local function removeEsp(player)
+    local esp = espCache[player]
+    if esp then
+        for _, d in pairs(esp) do d:Remove() end
+        espCache[player] = nil
+    end
+end
+
+local function updateEsp()
+    if not Camera then Camera = Workspace.CurrentCamera end
+    if not _G.ESP_Enabled then
+        for _, esp in pairs(espCache) do
+            for _, d in pairs(esp) do d.Visible = false end
+        end
+        return
+    end
+    for player, esp in pairs(espCache) do
+        if not player or not player.Parent then
+            removeEsp(player)
+            continue
+        end
+        local char = player.Character
+        if not char then
+            for _, d in pairs(esp) do d.Visible = false end
+            continue
+        end
+        local isEnemy = (not player.Team) or (player.Team ~= LocalPlayer.Team)
+        local cf = char:GetPivot()
+        local scr, onScr = Camera:WorldToViewportPoint(cf.Position)
+        if onScr then
+            local fH = math.tan(math.rad(Camera.FieldOfView*0.5)) * 2 * scr.Z
+            local size = Camera.ViewportSize.Y / fH * CHAR_SIZE
+            local pos = Vector2.new(scr.X, scr.Y)
+            esp.boxOutline.Size = floor2(size)
+            esp.boxOutline.Position = floor2(pos - size*0.5)
+            esp.box.Size = esp.boxOutline.Size
+            esp.box.Position = esp.boxOutline.Position
+            esp.name.Text = string.lower(player.Name)
+            esp.name.Position = floor2(pos - Vector2.yAxis*(size.Y*0.5 + esp.name.TextBounds.Y + 2))
+            esp.name.Color = isEnemy and espNameEnemyColor or espNameTeamColor
+            local hum = char:FindFirstChildOfClass("Humanoid")
+            local hp = (hum and hum.Health or 100)/100
+            esp.healthOutline.From = floor2(pos - size*0.5) - Vector2.xAxis*5
+            esp.healthOutline.To = floor2(pos - size*Vector2.new(0.5,-0.5)) - Vector2.xAxis*5
+            esp.health.From = esp.healthOutline.To
+            esp.health.To = floor2(esp.healthOutline.To:Lerp(esp.healthOutline.From, hp))
+            esp.health.Color = espHealthLowColor:Lerp(espHealthHighColor, hp)
+            esp.healthOutline.From -= Vector2.yAxis
+            esp.healthOutline.To += Vector2.yAxis
+            for _, d in pairs(esp) do d.Visible = true end
+        else
+            for _, d in pairs(esp) do d.Visible = false end
+        end
+    end
+end
+
+Players.PlayerAdded:Connect(function(p)
+    createEsp(p)
+    p.CharacterAdded:Connect(function() createEsp(p) end)
+end)
+Players.PlayerRemoving:Connect(function(p) removeEsp(p) end)
+RunService.RenderStepped:Connect(updateEsp)
+for _, p in ipairs(Players:GetPlayers()) do createEsp(p) end
+
+_G.Aimbot_Enabled = false
+_G.FOV_Visible = false
+_G.LockNPC = false
+_G.StrongLock = false
+_G.NearestCrosshair = true
+
+local aimFOV = 50
+local aimSmooth = 1
+local aimPredict = 0
+local aimPart = "Head"
+local friendCheck = true
+local visibleCheck = false
+local silentAim = false
+local lockTarget = false
+local selectedTarget = nil
+
+local partPriority = {"Head", "HumanoidRootPart", "UpperTorso", "Torso"}
+
+local fovCircle = Drawing.new("Circle")
+fovCircle.Visible = false
+fovCircle.Thickness = 2
+fovCircle.Color = Color3.fromRGB(0,255,0)
+fovCircle.Filled = false
+fovCircle.Radius = aimFOV
+
+local function updateFOVPos()
+    local cam = Workspace.CurrentCamera
+    if cam then
+        local vp = cam.ViewportSize
+        fovCircle.Position = Vector2.new(vp.X/2, vp.Y/2)
+    end
+end
+updateFOVPos()
+
+local strongLockTarget = nil
+
+local function getPart(character)
+    for _, partName in ipairs(partPriority) do
+        local part = character:FindFirstChild(partName)
+        if part then return part end
+    end
+    return character:FindFirstChildWhichIsA("BasePart")
+end
+
+local function isVisible(part)
+    if not visibleCheck then return true end
+    local cam = Workspace.CurrentCamera
+    local ray = RaycastParams.new()
+    ray.FilterDescendantsInstances = {LocalPlayer.Character}
+    ray.FilterType = Enum.RaycastFilterType.Blacklist
+    ray.IgnoreWater = true
+    local result = Workspace:Raycast(cam.CFrame.Position, (part.Position - cam.CFrame.Position).Unit * 1000, ray)
+    if result then
+        return result.Instance:IsDescendantOf(part.Parent)
+    end
+    return false
+end
+
+local function getAvailableTargets()
+    local targets = {}
+    for _, plr in pairs(Players:GetPlayers()) do
+        if plr ~= LocalPlayer then
+            local char = plr.Character
+            if char then
+                local part = getPart(char)
+                local hum = char:FindFirstChildOfClass("Humanoid")
+                if part and hum and hum.Health > 0 then
+                    table.insert(targets, {type = "Player", instance = plr, part = part, hum = hum, char = char})
+                end
+            end
+        end
+    end
+    if _G.LockNPC then
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj:IsA("Model") and obj:FindFirstChildOfClass("Humanoid") then
+                local hum = obj:FindFirstChildOfClass("Humanoid")
+                if hum and hum.Health > 0 then
+                    local part = getPart(obj)
+                    if part then
+                        table.insert(targets, {type = "NPC", instance = obj, part = part, hum = hum, char = obj})
+                    end
+                end
+            end
+        end
+    end
+    return targets
+end
+
+local function getTarget()
+    if lockTarget and selectedTarget then
+        local plr = Players:FindFirstChild(selectedTarget)
+        if plr and plr.Character then
+            local part = getPart(plr.Character)
+            if part and plr.Character:FindFirstChildOfClass("Humanoid") and plr.Character.Humanoid.Health > 0 then
+                return plr, part
+            end
+        end
+        return nil
+    end
+
+    if _G.StrongLock and strongLockTarget then
+        local target = strongLockTarget
+        if target.part and target.part.Parent and target.hum and target.hum.Health > 0 then
+            if isVisible(target.part) then
+                return target.instance, target.part
+            else
+                strongLockTarget = nil
+            end
+        else
+            strongLockTarget = nil
+        end
+    end
+
+    local center = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y/2)
+    local best, bestDist, bestTargetObj = nil, math.huge, nil
+
+    local targets = getAvailableTargets()
+    for _, t in ipairs(targets) do
+        if friendCheck and t.type == "Player" and t.instance:IsFriendsWith(LocalPlayer.UserId) then
+            continue
+        end
+        if not isVisible(t.part) then continue end
+        local pos, onScreen = Camera:WorldToViewportPoint(t.part.Position)
+        if not onScreen then continue end
+        local screenPos = Vector2.new(pos.X, pos.Y)
+        local distFromCrosshair = (screenPos - center).Magnitude
+        if distFromCrosshair <= aimFOV then
+            local priority = distFromCrosshair
+            if not _G.NearestCrosshair then
+                local char = LocalPlayer.Character
+                local root = char and char:FindFirstChild("HumanoidRootPart")
+                if root then
+                    priority = (root.Position - t.part.Position).Magnitude
+                else
+                    priority = distFromCrosshair
+                end
+            end
+            if priority < bestDist then
+                bestDist = priority
+                best = t.instance
+                bestTargetObj = t
+            end
+        end
+    end
+
+    if best and bestTargetObj then
+        if _G.StrongLock then
+            strongLockTarget = bestTargetObj
+        end
+        return best, bestTargetObj.part
+    end
+    return nil
+end
+
+local function updateAim()
+    if not _G.Aimbot_Enabled then return end
+    local target, targetPart = getTarget()
+    if targetPart then
+        local cam = Workspace.CurrentCamera
+        local targetPos = targetPart.Position
+        if aimPredict > 0 then
+            local hum = target:FindFirstChildOfClass("Humanoid") or (target.Character and target.Character:FindFirstChildOfClass("Humanoid"))
+            if hum then
+                targetPos = targetPos + (hum.MoveDirection * aimPredict)
+            end
+        end
+        local dir = (targetPos - cam.CFrame.Position).Unit
+        local current = cam.CFrame.LookVector
+        local angle = math.acos(current:Dot(dir))
+        if angle > 0.01 then
+            local step = math.min(1 / aimSmooth, 1)
+            local newDir = current:Lerp(dir, step)
+            cam.CFrame = CFrame.new(cam.CFrame.Position, cam.CFrame.Position + newDir)
+        end
+    end
+end
+
+local aimConnection
+local function startAim()
+    if aimConnection then aimConnection:Disconnect() end
+    if _G.Aimbot_Enabled then
+        aimConnection = RunService.RenderStepped:Connect(updateAim)
+    end
+end
+
+local function toggleAim(state)
+    _G.Aimbot_Enabled = state
+    fovCircle.Visible = _G.FOV_Visible and state
+    if not state then
+        strongLockTarget = nil
+    end
+    startAim()
+end
+
+local function toggleFOV(state)
+    _G.FOV_Visible = state
+    fovCircle.Visible = state and _G.Aimbot_Enabled
+end
+
+local CombatTab = Window:Tab({ Title = "战斗", Icon = "rbxassetid://103766254978089" })
+
+CombatTab:Toggle({
+    Title = "玩家圈框透视",
+    Value = false,
+    Callback = function(state) _G.ESP_Enabled = state end
+})
+
+CombatTab:Toggle({
+    Title = "自瞄开启",
+    Value = false,
+    Callback = function(state) toggleAim(state) end
+})
+
+CombatTab:Toggle({
+    Title = "FOV圈显示",
+    Value = false,
+    Callback = function(state) toggleFOV(state) end
+})
+
+CombatTab:Slider({
+    Title = "FOV圈大小",
+    Value = { Min = 50, Max = 500, Default = 50 },
+    Callback = function(value)
+        aimFOV = value
+        fovCircle.Radius = value
+    end
+})
+
+CombatTab:Slider({
+    Title = "自瞄平滑度",
+    Value = { Min = 1, Max = 50, Default = 1 },
+    Callback = function(value) aimSmooth = value end
+})
+
+CombatTab:Slider({
+    Title = "预判距离",
+    Value = { Min = 0, Max = 20, Default = 0 },
+    Callback = function(value) aimPredict = value end
+})
+
+CombatTab:Dropdown({
+    Title = "瞄准部位",
+    Values = {"Head", "HumanoidRootPart", "UpperTorso", "Torso"},
+    Value = "Head",
+    Callback = function(selected)
+        local idx = table.find(partPriority, selected)
+        if idx then
+            local item = table.remove(partPriority, idx)
+            table.insert(partPriority, 1, item)
+        end
+        aimPart = selected
+    end
+})
+
+CombatTab:Toggle({
+    Title = "好友检测",
+    Value = true,
+    Callback = function(state) friendCheck = state end
+})
+
+CombatTab:Toggle({
+    Title = "墙壁检测",
+    Value = false,
+    Callback = function(state) visibleCheck = state end
+})
+
+CombatTab:Toggle({
+    Title = "静默自瞄",
+    Value = false,
+    Callback = function(state) silentAim = state end
+})
+
+CombatTab:Toggle({
+    Title = "锁定自瞄",
+    Value = false,
+    Callback = function(state)
+        lockTarget = state
+        if not state then selectedTarget = nil end
+    end
+})
+
+local playerList = {}
+for _, p in ipairs(Players:GetPlayers()) do
+    if p ~= LocalPlayer then table.insert(playerList, p.Name) end
+end
+CombatTab:Dropdown({
+    Title = "选择玩家",
+    Values = playerList,
+    Value = playerList[1] or "",
+    Callback = function(selected) selectedTarget = selected end
+})
+
+CombatTab:Toggle({
+    Title = "锁定NPC",
+    Value = false,
+    Callback = function(state) _G.LockNPC = state end
+})
+
+CombatTab:Toggle({
+    Title = "强锁一人",
+    Value = false,
+    Callback = function(state)
+        _G.StrongLock = state
+        if not state then strongLockTarget = nil end
+    end
+})
+
+CombatTab:Toggle({
+    Title = "离准星最近",
+    Value = true,
+    Callback = function(state) _G.NearestCrosshair = state end
+})
+
+LocalPlayer.CharacterAdded:Connect(function()
+    if _G.Aimbot_Enabled then startAim() end
+end)
+
+RunService.RenderStepped:Connect(updateFOVPos)
+
+task.spawn(function()
+    while true do
+        task.wait(5)
+        for _, p in ipairs(Players:GetPlayers()) do
+            if not espCache[p] and p ~= LocalPlayer then
+                createEsp(p)
+            end
+        end
+    end
+end)
